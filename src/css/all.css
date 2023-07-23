@@ -18,6 +18,8 @@ body {
 }
 
 div#content {
+	display: grid;
+	grid-template-rows: min-content 1fr min-content;
 	position: relative;
 	min-height: 100vh;
 	color: #dddddd;
@@ -36,7 +38,7 @@ div#content {
 }
 
 .nav-bar {
-	position: fixed;
+	position: sticky;
 	top: 0;
 	left: 0;
 	right: 0;
@@ -187,4 +189,9 @@ div#content {
 
 input:checked + label .slider {
 	transform: translateX(33px);
+}
+
+.page-container {
+	padding-top: 1rem;
+	border: 1px solid #2ca9bc;
 }

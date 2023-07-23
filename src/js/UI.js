@@ -62,9 +62,16 @@ function displayNavBar() {
 	return navBar;
 }
 
+function makePageContainer() {
+	const pageContainer = document.createElement("div");
+	pageContainer.classList.add("page-container");
+	return pageContainer;
+}
+
 function pageLoad() {
 	const content = document.getElementById("content");
 	content.appendChild(displayNavBar());
+	content.appendChild(makePageContainer());
 }
 
 export default pageLoad;
