@@ -276,7 +276,6 @@ footer img {
 
 .current-data {
 	display: flex;
-	justify-content: space-between;
 	gap: 0.5rem;
 }
 
@@ -294,8 +293,7 @@ footer img {
 .current-min-max {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: 1.5rem;
+	gap: 2.5rem;
 }
 
 .current-info h2,
@@ -319,5 +317,5 @@ footer img {
 }
 
 .current-info h5 {
-	font-size: 1.5rem;
+	font-size: 1.2rem;
 }

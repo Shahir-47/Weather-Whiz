@@ -210,7 +210,7 @@ function pageLoad() {
 	content.appendChild(makePageContainer());
 	content.appendChild(displayFooter());
 	makeMainContainer();
-	getWeather("London");
+	getWeather("Los Angeles");
 }
 
 export default pageLoad;
