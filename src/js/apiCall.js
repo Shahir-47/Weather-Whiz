@@ -1,13 +1,13 @@
-async function getWeather(city) {
+async function getWeather(query) {
 	try {
 		const response = await fetch(
-			`http://api.weatherapi.com/v1/forecast.json?days=3&q=${city}&key=fca53d6c99b24b59ab3201455232107`,
+			`http://api.weatherapi.com/v1/forecast.json?days=3&q=${query}&key=fca53d6c99b24b59ab3201455232107`,
 			{ mode: "cors" },
 		);
 		const data = await response.json();
 		return data;
 	} catch (error) {
-		return "This place doesn't exist in our database.";
+		return error;
 	}
 }
 

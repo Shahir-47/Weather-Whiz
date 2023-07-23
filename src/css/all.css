@@ -200,9 +200,6 @@ input:checked + label .slider {
 	transform: translateX(33px);
 }
 
-.page-container {
-}
-
 footer {
 	display: flex;
 	flex-wrap: wrap;
@@ -256,4 +253,71 @@ footer a:active img {
 footer img {
 	width: 2rem;
 	height: auto;
+}
+
+.page-container {
+	display: grid;
+	grid-template-rows: 1fr 1fr;
+	padding: 3rem;
+}
+
+.current-weather {
+	display: flex;
+	justify-content: space-between;
+	gap: 2rem;
+	padding: 0 1rem;
+}
+
+.current-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.current-data {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.current-icon {
+	width: 7rem;
+	height: auto;
+}
+
+.current-details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.current-min-max {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+}
+
+.current-info h2,
+.current-info h3,
+.current-info h4,
+.current-info h5 {
+	margin: 0;
+}
+
+.current-info h2 {
+	font-size: 2rem;
+	font-weight: 900;
+}
+
+.current-info h3 {
+	font-size: 3rem;
+}
+
+.current-info h4 {
+	font-size: 2rem;
+}
+
+.current-info h5 {
+	font-size: 1.5rem;
 }
