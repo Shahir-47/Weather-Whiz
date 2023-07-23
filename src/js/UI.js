@@ -1,5 +1,6 @@
 import icon from "../img/icon.svg";
 import search from "../img/search.svg";
+import GitHub from "../img/git.svg";
 
 function displayNavBar() {
 	const navBar = document.createElement("div");
@@ -68,10 +69,52 @@ function makePageContainer() {
 	return pageContainer;
 }
 
+function displayFooter() {
+	const footer = document.createElement("footer");
+	footer.classList.add("footer");
+
+	// Link to my github profile
+	const gitHubProfile = document.createElement("a");
+	gitHubProfile.href = "https://github.com/Shahir-47";
+
+	// GitHub logo
+	const gitHubProfileImg = document.createElement("img");
+	gitHubProfileImg.src = GitHub;
+	gitHubProfileImg.alt = "gitHub Logo";
+
+	// my Github username
+	const gitHubProfileText = document.createElement("p");
+	const atSymbol = document.createElement("span");
+	atSymbol.classList.add("at-symbol");
+	atSymbol.textContent = "@";
+	const username = document.createElement("span");
+	username.textContent = "Shahir-47";
+	gitHubProfileText.appendChild(atSymbol);
+	gitHubProfileText.appendChild(username);
+
+	gitHubProfile.appendChild(gitHubProfileImg);
+	gitHubProfile.appendChild(gitHubProfileText);
+
+	const separator = document.createElement("p");
+	separator.textContent = "|";
+
+	// Link to this source code
+	const gitHubRepo = document.createElement("a");
+	gitHubRepo.href = "https://github.com/Shahir-47/Weather-Whiz";
+	gitHubRepo.textContent = "Source Code";
+
+	footer.appendChild(gitHubProfile);
+	footer.appendChild(separator);
+	footer.appendChild(gitHubRepo);
+
+	return footer;
+}
+
 function pageLoad() {
 	const content = document.getElementById("content");
 	content.appendChild(displayNavBar());
 	content.appendChild(makePageContainer());
+	content.appendChild(displayFooter());
 }
 
 export default pageLoad;
