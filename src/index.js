@@ -1,3 +1,5 @@
-import getWeather from "./js/apiCall";
+import "./css/all.css";
+import "./css/normalize.css";
+import pageLoad from "./js/UI";
 
-console.log(getWeather("Jeddah"));
+pageLoad();
