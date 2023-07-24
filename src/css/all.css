@@ -257,9 +257,10 @@ footer img {
 
 .page-container {
 	display: grid;
-	grid-template-rows: 1fr 1fr;
+	grid-template-rows: min-content 1fr;
 	padding: 3rem;
 	padding-bottom: 0;
+	gap: 1.5rem;
 }
 
 .current-weather {
@@ -326,7 +327,7 @@ footer img {
 	grid-template-columns: repeat(5, max-content);
 	/* justify-content: space-between; */
 	gap: 2.5rem;
-	grid-row-gap: 0;
+	grid-row-gap: 0.25rem;
 	grid-template-rows: repeat(3, 1fr);
 	align-items: center;
 	/* padding: 0 1rem; */
@@ -394,7 +395,7 @@ input[type="radio"] + label {
 	margin-right: 10px;
 }
 
-label {
+.container label {
 	display: inline-block;
 	padding: 10px 20px;
 	border-top-left-radius: 4px;
@@ -421,7 +422,7 @@ input[type="radio"] {
 }
 
 .forecast {
-	height: 100px;
+	height: 100%;
 	width: 100%;
 	border: 3px solid #dddddd;
 }

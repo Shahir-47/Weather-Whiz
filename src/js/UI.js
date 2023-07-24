@@ -292,7 +292,7 @@ function chooseForecast() {
 	day.value = "day";
 	const dayLabel = document.createElement("label");
 	dayLabel.setAttribute("for", "day");
-	dayLabel.textContent = "3-Day Forecast";
+	dayLabel.textContent = "Next 2 days";
 	secondChoice.appendChild(day);
 	secondChoice.appendChild(dayLabel);
 
