@@ -19,7 +19,30 @@ import cloud from "../img/cloud.svg";
 
 let weatherData = {};
 
-function displayCurrentWeatherData(data) {
+const getAirQuality = (aqi) => {
+	if (aqi <= 50) {
+		return "Good";
+	}
+	if (aqi <= 100) {
+		return "Moderate";
+	}
+	if (aqi <= 150) {
+		return "Unhealthy for Sensitive Groups";
+	}
+	if (aqi <= 200) {
+		return "Unhealthy";
+	}
+	if (aqi <= 300) {
+		return "Very Unhealthy";
+	}
+	return "Hazardous";
+};
+
+function displayWeatherData(data) {
+	let moonPhase = data.forecast.forecastday[0].astro.moon_phase;
+	moonPhase = moonPhase.replace(" ", "-");
+	moonPhase = moonPhase.toLowerCase();
+
 	document.querySelector(".current-location").textContent = data.location.name;
 	document.querySelector(
 		".current-icon",
@@ -32,9 +55,52 @@ function displayCurrentWeatherData(data) {
 	document.querySelector(
 		".current-min",
 	).textContent = `Min: ${data.forecast.forecastday[0].day.mintemp_f} °F`;
+
 	document.querySelector(
 		".current-max",
 	).textContent = `Max: ${data.forecast.forecastday[0].day.maxtemp_f} °F`;
+
+	document.querySelector(
+		".temp",
+	).textContent = `${data.current.feelslike_f} °F`;
+	document.querySelector(".humidity").textContent = `${data.current.humidity}%`;
+	document.querySelector(
+		".rain",
+	).textContent = `${data.forecast.forecastday[0].day.daily_chance_of_rain}%`;
+	document.querySelector(".wind").textContent = `${data.current.wind_mph} mph`;
+	document.querySelector(
+		".snow",
+	).textContent = `${data.forecast.forecastday[0].day.daily_chance_of_snow}%`;
+	document.querySelector(".air").textContent = `${getAirQuality(
+		data.current.air_quality.pm2_5,
+	)}`;
+	document.querySelector(
+		".sunrise",
+	).textContent = `${data.forecast.forecastday[0].astro.sunrise}`;
+	document.querySelector(
+		".sunset",
+	).textContent = `${data.forecast.forecastday[0].astro.sunset}`;
+	document.querySelector(
+		".pressure",
+	).textContent = `${data.current.pressure_mb} mb`;
+	document.querySelector(
+		".visibility",
+	).textContent = `${data.current.vis_miles} miles`;
+	document.querySelector(".uv").textContent = `${data.current.uv}`;
+	document.querySelector(
+		".precipitation",
+	).textContent = `${data.forecast.forecastday[0].day.totalprecip_in} inches`;
+	document.querySelector(
+		".snow-depth",
+	).textContent = `${data.forecast.forecastday[0].day.totalprecip_in} inches`;
+	document.querySelector(".cloud-cover").textContent = `${data.current.cloud}%`;
+	document.querySelector(
+		".moon-phase",
+	).textContent = `${data.forecast.forecastday[0].astro.moon_phase}`;
+
+	document.querySelector(
+		"img[alt='Moon Phase icon']",
+	).src = `./img/moon/${moonPhase}.svg`;
 }
 
 async function getWeather(query) {
@@ -45,9 +111,9 @@ async function getWeather(query) {
 		);
 		weatherData = await response.json();
 		console.log(weatherData);
-		displayCurrentWeatherData(weatherData);
+		displayWeatherData(weatherData);
 	} catch (error) {
-		displayCurrentWeatherData(error);
+		displayWeatherData(error);
 	}
 }
 
@@ -213,7 +279,7 @@ function displayCurrentWeather() {
 	return currentWeather;
 }
 
-function createIndivInfo(image, title, value) {
+function createIndivInfo(image, title, value, className) {
 	const weatherInfo = document.createElement("div");
 	weatherInfo.classList.add("more-weather-info");
 
@@ -232,6 +298,7 @@ function createIndivInfo(image, title, value) {
 
 	const weatherInfoValue = document.createElement("h4");
 	weatherInfoValue.classList.add("more-weather-value");
+	weatherInfoValue.classList.add(className);
 	weatherInfoValue.textContent = value;
 	weatherInfoText.appendChild(weatherInfoTitle);
 	weatherInfoText.appendChild(weatherInfoValue);
@@ -243,22 +310,40 @@ function createIndivInfo(image, title, value) {
 function displayMoreWeather() {
 	const moreWeather = document.createElement("div");
 	moreWeather.classList.add("more-weather");
-	moreWeather.appendChild(createIndivInfo(temp, "Feels Like", "83 °F"));
-	moreWeather.appendChild(createIndivInfo(humidity, "Humidity", "83%"));
-	moreWeather.appendChild(createIndivInfo(rain, "Chance of Rain", "0%"));
-	moreWeather.appendChild(createIndivInfo(wind, "Wind", "5 mph"));
-	moreWeather.appendChild(createIndivInfo(snowCloud, "Chance of Snow", "0%"));
-	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good"));
-	moreWeather.appendChild(createIndivInfo(sunrise, "Sunrise", "6:00 AM"));
-	moreWeather.appendChild(createIndivInfo(sunset, "Sunset", "6:00 PM"));
-	moreWeather.appendChild(createIndivInfo(pressure, "Pressure", "1000 mb"));
-	moreWeather.appendChild(createIndivInfo(visibility, "Visibility", "10 mi"));
-	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0"));
-	moreWeather.appendChild(createIndivInfo(raindrops, "Precipitation", "0 in"));
-	moreWeather.appendChild(createIndivInfo(snow, "Snow", "0 in"));
-	moreWeather.appendChild(createIndivInfo(cloud, "Cloud Cover", "0%"));
+	moreWeather.appendChild(createIndivInfo(temp, "Feels Like", "83 °F", "temp"));
 	moreWeather.appendChild(
-		createIndivInfo(moon, "Moon Phase", "Waning Gibbous"),
+		createIndivInfo(humidity, "Humidity", "83%", "humidity"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(rain, "Chance of Rain", "0%", "rain"),
+	);
+	moreWeather.appendChild(createIndivInfo(wind, "Wind", "5 mph", "wind"));
+	moreWeather.appendChild(
+		createIndivInfo(snowCloud, "Chance of Snow", "0%", "snow"),
+	);
+	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good", "air"));
+	moreWeather.appendChild(
+		createIndivInfo(sunrise, "Sunrise", "6:00 AM", "sunrise"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(sunset, "Sunset", "6:00 PM", "sunset"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(pressure, "Pressure", "1000 mb", "pressure"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(visibility, "Visibility", "10 mi", "visibility"),
+	);
+	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0", "uv"));
+	moreWeather.appendChild(
+		createIndivInfo(raindrops, "Precipitation", "0 in", "precipitation"),
+	);
+	moreWeather.appendChild(createIndivInfo(snow, "Snow", "0 in", "snow-depth"));
+	moreWeather.appendChild(
+		createIndivInfo(cloud, "Cloud Cover", "0%", "cloud-cover"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(moon, "Moon Phase", "Waning Gibbous", "moon-phase"),
 	);
 	return moreWeather;
 }
@@ -377,7 +462,7 @@ function makeHourlyForecast() {
 	forecastSlider.classList.add("forecast-slider");
 	forecast.appendChild(forecastSlider);
 
-	for (let i = 0; i < 24; i++) {
+	for (let i = 0; i < 24; i += 1) {
 		forecastSlider.appendChild(makeHourlyCard());
 	}
 
