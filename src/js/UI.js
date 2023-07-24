@@ -302,11 +302,97 @@ function chooseForecast() {
 	return container;
 }
 
+function makeHourlyCard() {
+	const hourlyCard = document.createElement("div");
+	hourlyCard.classList.add("hourly-card");
+
+	const hourlyTime = document.createElement("h3");
+	hourlyTime.classList.add("hourly-time");
+	hourlyTime.textContent = "12:00 PM";
+	hourlyCard.appendChild(hourlyTime);
+
+	const hourlyIcon = document.createElement("img");
+	hourlyIcon.classList.add("hourly-icon");
+	hourlyIcon.src = icon;
+	hourlyIcon.alt = "weather icon";
+	hourlyCard.appendChild(hourlyIcon);
+
+	const hourlyTemp = document.createElement("h4");
+	hourlyTemp.classList.add("hourly-temp");
+	hourlyTemp.textContent = "83 °F";
+	hourlyCard.appendChild(hourlyTemp);
+
+	const hourlyCondition = document.createElement("h5");
+	hourlyCondition.classList.add("hourly-condition");
+	hourlyCondition.textContent = "Sunny";
+	hourlyCard.appendChild(hourlyCondition);
+
+	const moreInfo = document.createElement("div");
+	moreInfo.classList.add("more-info-hourly");
+
+	const moreInfoRain = document.createElement("div");
+	moreInfoRain.classList.add("more-info-rain");
+
+	const moreInfoRainIcon = document.createElement("img");
+	moreInfoRainIcon.classList.add("more-info-rain-icon");
+	moreInfoRainIcon.src = rain;
+	moreInfoRainIcon.alt = "rain icon";
+	moreInfoRain.appendChild(moreInfoRainIcon);
+
+	const moreInfoRainText = document.createElement("h6");
+	moreInfoRainText.classList.add("more-info-rain-text");
+	moreInfoRainText.textContent = "0%";
+	moreInfoRain.appendChild(moreInfoRainText);
+	moreInfo.appendChild(moreInfoRain);
+
+	const moreInfoSnow = document.createElement("div");
+	moreInfoSnow.classList.add("more-info-snow");
+
+	const moreInfoSnowIcon = document.createElement("img");
+	moreInfoSnowIcon.classList.add("more-info-snow-icon");
+	moreInfoSnowIcon.src = snow;
+	moreInfoSnowIcon.alt = "snow icon";
+	moreInfoSnow.appendChild(moreInfoSnowIcon);
+
+	const moreInfoSnowText = document.createElement("h6");
+	moreInfoSnowText.classList.add("more-info-snow-text");
+	moreInfoSnowText.textContent = "0%";
+	moreInfoSnow.appendChild(moreInfoSnowText);
+	moreInfo.appendChild(moreInfoSnow);
+
+	hourlyCard.appendChild(moreInfo);
+
+	return hourlyCard;
+}
+
+function makeHourlyForecast() {
+	const forecast = document.querySelector(".forecast");
+
+	const backBtn = document.createElement("button");
+	backBtn.classList.add("back-btn");
+	backBtn.textContent = "<";
+	forecast.appendChild(backBtn);
+
+	const forecastSlider = document.createElement("div");
+	forecastSlider.classList.add("forecast-slider");
+	forecast.appendChild(forecastSlider);
+
+	for (let i = 0; i < 24; i++) {
+		forecastSlider.appendChild(makeHourlyCard());
+	}
+
+	const nextBtn = document.createElement("button");
+	nextBtn.classList.add("next-btn");
+	nextBtn.textContent = ">";
+	forecast.appendChild(nextBtn);
+
+	return forecast;
+}
+
 function makeForecast() {
 	const forecast = document.createElement("div");
 	forecast.classList.add("forecast");
 	forecast.classList.add("hourly-forecast");
-
 	return forecast;
 }
 
@@ -335,6 +421,7 @@ function pageLoad() {
 	content.appendChild(displayFooter());
 	makeMainContainer();
 	bottomContainer();
+	makeHourlyForecast();
 	getWeather("Los Angeles");
 }
 
