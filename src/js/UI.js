@@ -1,6 +1,23 @@
 import icon from "../img/icon.svg";
 import search from "../img/search.svg";
 import GitHub from "../img/git.svg";
+import temp from "../img/temp.svg";
+import rain from "../img/rain.svg";
+import humidity from "../img/humidity.svg";
+import wind from "../img/wind.svg";
+import snow from "../img/snow.svg";
+import air from "../img/air.svg";
+import sunrise from "../img/sunrise.svg";
+import sunset from "../img/sunset.svg";
+import pressure from "../img/pressure.svg";
+import visibility from "../img/visibility.svg";
+import uv from "../img/uv.svg";
+import raindrops from "../img/raindrops.svg";
+import snowCloud from "../img/snow-cloud.svg";
+import moon from "../img/moon/full-moon.svg";
+import cloud from "../img/cloud.svg";
+
+let weatherData = {};
 
 function displayCurrentWeatherData(data) {
 	document.querySelector(".current-location").textContent = data.location.name;
@@ -23,12 +40,12 @@ function displayCurrentWeatherData(data) {
 async function getWeather(query) {
 	try {
 		const response = await fetch(
-			`http://api.weatherapi.com/v1/forecast.json?days=3&q=${query}&key=fca53d6c99b24b59ab3201455232107`,
+			`http://api.weatherapi.com/v1/forecast.json?days=3&aqi=yes&q=${query}&key=fca53d6c99b24b59ab3201455232107`,
 			{ mode: "cors" },
 		);
-		const data = await response.json();
-		console.log(data);
-		displayCurrentWeatherData(data);
+		weatherData = await response.json();
+		console.log(weatherData);
+		displayCurrentWeatherData(weatherData);
 	} catch (error) {
 		displayCurrentWeatherData(error);
 	}
@@ -196,12 +213,119 @@ function displayCurrentWeather() {
 	return currentWeather;
 }
 
+function createIndivInfo(image, title, value) {
+	const weatherInfo = document.createElement("div");
+	weatherInfo.classList.add("more-weather-info");
+
+	const weatherInfoIcon = document.createElement("img");
+	weatherInfoIcon.classList.add("more-weather-icon");
+	weatherInfoIcon.src = image;
+	weatherInfoIcon.alt = `${title} icon`;
+	weatherInfo.appendChild(weatherInfoIcon);
+
+	const weatherInfoText = document.createElement("div");
+	weatherInfoText.classList.add("more-weather-text");
+
+	const weatherInfoTitle = document.createElement("h3");
+	weatherInfoTitle.classList.add("more-weather-title");
+	weatherInfoTitle.textContent = title;
+
+	const weatherInfoValue = document.createElement("h4");
+	weatherInfoValue.classList.add("more-weather-value");
+	weatherInfoValue.textContent = value;
+	weatherInfoText.appendChild(weatherInfoTitle);
+	weatherInfoText.appendChild(weatherInfoValue);
+	weatherInfo.appendChild(weatherInfoText);
+
+	return weatherInfo;
+}
+
+function displayMoreWeather() {
+	const moreWeather = document.createElement("div");
+	moreWeather.classList.add("more-weather");
+	moreWeather.appendChild(createIndivInfo(temp, "Feels Like", "83 °F"));
+	moreWeather.appendChild(createIndivInfo(humidity, "Humidity", "83%"));
+	moreWeather.appendChild(createIndivInfo(rain, "Chance of Rain", "0%"));
+	moreWeather.appendChild(createIndivInfo(wind, "Wind", "5 mph"));
+	moreWeather.appendChild(createIndivInfo(snowCloud, "Chance of Snow", "0%"));
+	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good"));
+	moreWeather.appendChild(createIndivInfo(sunrise, "Sunrise", "6:00 AM"));
+	moreWeather.appendChild(createIndivInfo(sunset, "Sunset", "6:00 PM"));
+	moreWeather.appendChild(createIndivInfo(pressure, "Pressure", "1000 mb"));
+	moreWeather.appendChild(createIndivInfo(visibility, "Visibility", "10 mi"));
+	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0"));
+	moreWeather.appendChild(createIndivInfo(raindrops, "Precipitation", "0 in"));
+	moreWeather.appendChild(createIndivInfo(snow, "Snow", "0 in"));
+	moreWeather.appendChild(createIndivInfo(cloud, "Cloud Cover", "0%"));
+	moreWeather.appendChild(
+		createIndivInfo(moon, "Moon Phase", "Waning Gibbous"),
+	);
+	return moreWeather;
+}
+
+function chooseForecast() {
+	const container = document.createElement("div");
+	container.classList.add("container");
+
+	const firstChoice = document.createElement("div");
+	firstChoice.classList.add("choice");
+
+	const hourly = document.createElement("input");
+	hourly.type = "radio";
+	hourly.id = "hourly";
+	hourly.name = "forecast";
+	hourly.value = "hourly";
+	hourly.checked = true;
+	const hourlyLabel = document.createElement("label");
+	hourlyLabel.setAttribute("for", "hourly");
+	hourlyLabel.textContent = "Hourly";
+	firstChoice.appendChild(hourly);
+	firstChoice.appendChild(hourlyLabel);
+
+	const secondChoice = document.createElement("div");
+	secondChoice.classList.add("choice");
+
+	const day = document.createElement("input");
+	day.type = "radio";
+	day.id = "day";
+	day.name = "forecast";
+	day.value = "day";
+	const dayLabel = document.createElement("label");
+	dayLabel.setAttribute("for", "day");
+	dayLabel.textContent = "3-Day Forecast";
+	secondChoice.appendChild(day);
+	secondChoice.appendChild(dayLabel);
+
+	container.appendChild(firstChoice);
+	container.appendChild(secondChoice);
+
+	return container;
+}
+
+function makeForecast() {
+	const forecast = document.createElement("div");
+	forecast.classList.add("forecast");
+	forecast.classList.add("hourly-forecast");
+
+	return forecast;
+}
+
 function makeMainContainer() {
 	const pageContainer = document.querySelector(".page-container");
 	const main = document.createElement("div");
 	main.classList.add("main");
 	main.appendChild(displayCurrentWeather());
+	main.appendChild(displayMoreWeather());
 	pageContainer.appendChild(main);
+}
+
+function bottomContainer() {
+	const pageContainer = document.querySelector(".page-container");
+	const bottom = document.createElement("div");
+	bottom.classList.add("bottom");
+	bottom.appendChild(chooseForecast());
+	bottom.appendChild(makeForecast());
+	pageContainer.appendChild(bottom);
 }
 
 function pageLoad() {
@@ -210,7 +334,24 @@ function pageLoad() {
 	content.appendChild(makePageContainer());
 	content.appendChild(displayFooter());
 	makeMainContainer();
+	bottomContainer();
 	getWeather("Los Angeles");
 }
 
+function displayForecast() {
+	const forecast = document.querySelector(".forecast");
+	const choice = document.querySelector('input[name="forecast"]:checked').value;
+	console.log(choice);
+	if (choice === "hourly") {
+		forecast.innerHTML = "";
+		forecast.classList.remove("daily-forecast");
+		forecast.classList.add("hourly-forecast");
+	} else {
+		forecast.innerHTML = "";
+		forecast.classList.remove("hourly-forecast");
+		forecast.classList.add("daily-forecast");
+	}
+}
+
 export default pageLoad;
+export { getWeather, displayForecast };
