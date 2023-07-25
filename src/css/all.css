@@ -282,7 +282,7 @@ footer img {
 }
 
 .current-icon {
-	width: 7rem;
+	min-width: 7rem;
 	height: auto;
 }
 
@@ -443,6 +443,9 @@ input[type="radio"] {
 	border-radius: 15px;
 	background-color: #ffffff17;
 	justify-content: center;
+	transform: rotateX(180deg);
+	-ms-transform: rotateX(180deg); /* IE 9 */
+	-webkit-transform: rotateX(180deg); /* Safari and Chrome */
 }
 
 .astro-card * {
@@ -457,6 +460,10 @@ input[type="radio"] {
 
 .info-length {
 	font-size: 1.1rem;
+}
+
+.medium-text {
+	font-size: 1.3rem;
 }
 
 .daily-forecast {
@@ -474,9 +481,38 @@ input[type="radio"] {
 
 .forecast-slider {
 	display: flex;
-	overflow-x: hidden;
+	overflow-x: auto;
 	gap: 1rem;
 	padding: 0 1rem;
+	transform: rotateX(180deg);
+	-ms-transform: rotateX(180deg); /* IE 9 */
+	-webkit-transform: rotateX(180deg); /* Safari and Chrome */
+	margin-top: 0.2rem;
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+
+/* Style the scrollbar */
+.forecast-slider::-webkit-scrollbar {
+	width: 5px; /* Set the width of the scrollbar */
+	height: 5px; /* Set the height of the scrollbar */
+}
+
+.forecast-slider::-webkit-scrollbar-thumb {
+	background-color: #bbb; /* Color of the scrollbar thumb */
+	border-radius: 5px; /* Rounded corners for the scrollbar thumb */
+}
+
+.forecast-slider::-webkit-scrollbar-thumb:hover {
+	background-color: #999; /* Color of the scrollbar thumb on hover */
+}
+
+.forecast-slider::-webkit-scrollbar-track {
+	background-color: transparent; /* Color of the scrollbar track */
+}
+
+.forecast-slider::-webkit-scrollbar-corner {
+	background-color: transparent; /* Color of the scrollbar corner */
 }
 
 .hourly-card {
@@ -492,6 +528,9 @@ input[type="radio"] {
 	background-color: #ffffff17;
 	cursor: pointer;
 	transition: all 0.3s ease;
+	transform: rotateX(180deg);
+	-ms-transform: rotateX(180deg); /* IE 9 */
+	-webkit-transform: rotateX(180deg); /* Safari and Chrome */
 }
 
 .hourly-card:hover {

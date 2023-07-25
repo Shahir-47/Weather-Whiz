@@ -364,6 +364,8 @@ function createHourlyCard(data, unit) {
 function displayWeatherData(data, unit) {
 	if (countWords(data.current.condition.text) >= 6) {
 		document.querySelector(".current-condition").classList.add("info-length");
+	} else if (countWords(data.current.condition.text) >= 3) {
+		document.querySelector(".current-condition").classList.add("medium-text");
 	}
 
 	if (unit === "imperial") {
