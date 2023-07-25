@@ -69,6 +69,15 @@ function convertCmToInches(cm) {
 	return cm * inchesPerCm;
 }
 
+function countWords(text) {
+	// Remove leading and trailing white spaces from the text
+	const textStr = text.trim();
+	// Split the text into an array of words using space as the delimiter
+	const wordsArray = textStr.split(/\s+/);
+	// Return the number of words in the array
+	return wordsArray.length;
+}
+
 // --------------------------------- Display Data from API --------------------------------- //
 
 function createAstroCard(time, weatherIcon, text) {
@@ -164,12 +173,18 @@ function makeHourlyCard(
 	return hourlyCard;
 }
 
-function createHourlyCard(data) {
+function createHourlyCard(data, unit) {
 	const forecastSlider = document.querySelector(".forecast-slider");
 	forecastSlider.innerHTML = "";
 	const now = parse(data.location.localtime.slice(11, 16), "HH:mm", new Date());
 	let index = 0;
 	let totalCards = 0;
+	let currentTemp;
+	if (unit === "imperial") {
+		currentTemp = `${data.current.temp_f} °F`;
+	} else {
+		currentTemp = `${data.current.temp_c} °C`;
+	}
 
 	data.forecast.forecastday[0].hour.every((hour, i) => {
 		const time = parse(hour.time.slice(11, 16), "HH:mm", new Date());
@@ -184,7 +199,7 @@ function createHourlyCard(data) {
 		makeHourlyCard(
 			"Now",
 			`./img/weather/${data.current.condition.icon.slice(29)}`,
-			`${data.current.temp_f} °F`,
+			`${currentTemp}`,
 			data.current.condition.text,
 			`${data.forecast.forecastday[0].day.daily_chance_of_rain}%`,
 			`${data.forecast.forecastday[0].day.daily_chance_of_snow}%`,
@@ -220,7 +235,13 @@ function createHourlyCard(data) {
 		const iconImage = `./img/weather/${data.forecast.forecastday[0].hour[
 			i
 		].condition.icon.slice(29)}`;
-		const temperature = `${data.forecast.forecastday[0].hour[i].temp_f} °F`;
+
+		let temperature;
+		if (unit === "imperial") {
+			temperature = `${data.forecast.forecastday[0].hour[i].temp_f} °F`;
+		} else {
+			temperature = `${data.forecast.forecastday[0].hour[i].temp_c} °C`;
+		}
 		const condition = data.forecast.forecastday[0].hour[i].condition.text;
 		const rainChance = `${data.forecast.forecastday[0].hour[i].chance_of_rain}%`;
 		const snowChance = `${data.forecast.forecastday[0].hour[i].chance_of_snow}%`;
@@ -291,7 +312,12 @@ function createHourlyCard(data) {
 		const iconImage = `./img/weather/${data.forecast.forecastday[1].hour[
 			i
 		].condition.icon.slice(29)}`;
-		const temperature = `${data.forecast.forecastday[1].hour[i].temp_f} °F`;
+		let temperature;
+		if (unit === "imperial") {
+			temperature = `${data.forecast.forecastday[1].hour[i].temp_f} °F`;
+		} else {
+			temperature = `${data.forecast.forecastday[1].hour[i].temp_c} °C`;
+		}
 		const condition = data.forecast.forecastday[1].hour[i].condition.text;
 		const rainChance = `${data.forecast.forecastday[1].hour[i].chance_of_rain}%`;
 		const snowChance = `${data.forecast.forecastday[1].hour[i].chance_of_snow}%`;
@@ -335,7 +361,147 @@ function createHourlyCard(data) {
 	console.log(totalCards);
 }
 
-function displayWeatherData(data) {
+function displayWeatherData(data, unit) {
+	if (countWords(data.current.condition.text) >= 6) {
+		document.querySelector(".current-condition").classList.add("info-length");
+	}
+
+	if (unit === "imperial") {
+		document.querySelector(
+			".current-temp",
+		).textContent = `${data.current.temp_f} °F`;
+
+		document.querySelector(
+			".current-min",
+		).textContent = `Min: ${data.forecast.forecastday[0].day.mintemp_f} °F`;
+
+		document.querySelector(
+			".current-max",
+		).textContent = `Max: ${data.forecast.forecastday[0].day.maxtemp_f} °F`;
+
+		document.querySelector(
+			".temp",
+		).textContent = `${data.current.feelslike_f} °F`;
+		if (data.current.feelslike_f > 80) {
+			document.querySelector(".temp").style.color = `#FF0000`;
+		} else if (data.current.feelslike_f < 50) {
+			document.querySelector(".temp").style.color = `#6495ED`;
+		}
+
+		document.querySelector(
+			".wind",
+		).textContent = `${data.current.wind_mph} mph`;
+		if (data.current.wind_mph > 25 && data.current.wind_mph < 38) {
+			document.querySelector(".wind").style.color = `orange`;
+		} else if (data.current.wind_mph > 38) {
+			document.querySelector(".wind").style.color = `#FF0000`;
+		}
+
+		document.querySelector(
+			".pressure",
+		).textContent = `${data.current.pressure_in} inHg`;
+		if (data.current.pressure_in <= 30.15) {
+			if (data.current.pressure_in < 29.6) {
+				document.querySelector(".pressure").style.color = `#FF0000`;
+			} else {
+				document.querySelector(".pressure").style.color = `orange`;
+			}
+		}
+
+		document.querySelector(
+			".visibility",
+		).textContent = `${data.current.vis_miles} miles`;
+		if (data.current.vis_miles <= 2) {
+			if (data.current.vis_miles < 0.5) {
+				document.querySelector(".visibility").style.color = `#FF0000`;
+			} else {
+				document.querySelector(".visibility").style.color = `orange`;
+			}
+		}
+
+		document.querySelector(
+			".precipitation",
+		).textContent = `${data.current.precip_in} inches`;
+		if (data.current.precip_in >= 2) {
+			document.querySelector(".precipitation").style.color = `#6495ED`;
+		}
+
+		document.querySelector(".snow-depth").textContent = `${convertCmToInches(
+			data.forecast.forecastday[0].day.totalsnow_cm,
+		)} inches`;
+		if (
+			convertCmToInches(data.forecast.forecastday[0].day.totalsnow_cm) >= 12
+		) {
+			document.querySelector(".snow-depth").style.color = `#6495ED`;
+		}
+	} else {
+		document.querySelector(
+			".current-temp",
+		).textContent = `${data.current.temp_c} °C`;
+
+		document.querySelector(
+			".current-min",
+		).textContent = `Min: ${data.forecast.forecastday[0].day.mintemp_c} °C`;
+
+		document.querySelector(
+			".current-max",
+		).textContent = `Max: ${data.forecast.forecastday[0].day.maxtemp_c} °C`;
+
+		document.querySelector(
+			".temp",
+		).textContent = `${data.current.feelslike_c} °C`;
+		if (data.current.feelslike_c > 26.6) {
+			document.querySelector(".temp").style.color = `#FF0000`;
+		} else if (data.current.feelslike_c < 10) {
+			document.querySelector(".temp").style.color = `#6495ED`;
+		}
+
+		document.querySelector(
+			".wind",
+		).textContent = `${data.current.wind_kph} km/h`;
+		if (data.current.wind_kph > 40.2336 && data.current.wind_kph < 61.152) {
+			document.querySelector(".wind").style.color = `orange`;
+		} else if (data.current.wind_kph > 61.152) {
+			document.querySelector(".wind").style.color = `#FF0000`;
+		}
+
+		document.querySelector(
+			".pressure",
+		).textContent = `${data.current.pressure_mb} mb`;
+		if (data.current.pressure_mb <= 1020.6) {
+			if (data.current.pressure_mb < 1005.84) {
+				document.querySelector(".pressure").style.color = `#FF0000`;
+			} else {
+				document.querySelector(".pressure").style.color = `orange`;
+			}
+		}
+
+		document.querySelector(
+			".visibility",
+		).textContent = `${data.current.vis_km} km`;
+		if (data.current.vis_km <= 3.21869) {
+			if (data.current.vis_km < 0.804672) {
+				document.querySelector(".visibility").style.color = `#FF0000`;
+			} else {
+				document.querySelector(".visibility").style.color = `orange`;
+			}
+		}
+
+		document.querySelector(
+			".precipitation",
+		).textContent = `${data.current.precip_mm} mm`;
+		if (data.current.precip_mm >= 50.8) {
+			document.querySelector(".precipitation").style.color = `#6495ED`;
+		}
+
+		document.querySelector(
+			".snow-depth",
+		).textContent = `${data.forecast.forecastday[0].day.totalsnow_cm} cm`;
+		if (data.forecast.forecastday[0].day.totalsnow_cm >= 30.48) {
+			document.querySelector(".snow-depth").style.color = `#6495ED`;
+		}
+	}
+
 	let moonPhase = data.forecast.forecastday[0].astro.moon_phase;
 	moonPhase = moonPhase.replace(" ", "-");
 	moonPhase = moonPhase.toLowerCase();
@@ -346,29 +512,8 @@ function displayWeatherData(data) {
 		".current-icon",
 	).src = `./img/weather/${data.current.condition.icon.slice(29)}`;
 
-	document.querySelector(
-		".current-temp",
-	).textContent = `${data.current.temp_f} °F`;
-
 	document.querySelector(".current-condition").textContent =
 		data.current.condition.text;
-
-	document.querySelector(
-		".current-min",
-	).textContent = `Min: ${data.forecast.forecastday[0].day.mintemp_f} °F`;
-
-	document.querySelector(
-		".current-max",
-	).textContent = `Max: ${data.forecast.forecastday[0].day.maxtemp_f} °F`;
-
-	document.querySelector(
-		".temp",
-	).textContent = `${data.current.feelslike_f} °F`;
-	if (data.current.feelslike_f > 80) {
-		document.querySelector(".temp").style.color = `#FF0000`;
-	} else if (data.current.feelslike_f < 50) {
-		document.querySelector(".temp").style.color = `#6495ED`;
-	}
 
 	document.querySelector(".humidity").textContent = `${data.current.humidity}%`;
 
@@ -377,13 +522,6 @@ function displayWeatherData(data) {
 	).textContent = `${data.forecast.forecastday[0].day.daily_chance_of_rain}%`;
 	if (data.forecast.forecastday[0].day.daily_chance_of_rain > 70) {
 		document.querySelector(".rain").style.color = `#6495ED`;
-	}
-
-	document.querySelector(".wind").textContent = `${data.current.wind_mph} mph`;
-	if (data.current.wind_mph > 25 && data.current.wind_mph < 38) {
-		document.querySelector(".wind").style.color = `orange`;
-	} else if (data.current.wind_mph > 38) {
-		document.querySelector(".wind").style.color = `#FF0000`;
 	}
 
 	document.querySelector(
@@ -405,47 +543,11 @@ function displayWeatherData(data) {
 		".sunset",
 	).textContent = `${data.forecast.forecastday[0].astro.sunset}`;
 
-	document.querySelector(
-		".pressure",
-	).textContent = `${data.current.pressure_mb} mb`;
-	if (data.current.pressure_mb <= 1015) {
-		if (data.current.pressure_mb < 1000) {
-			document.querySelector(".pressure").style.color = `#FF0000`;
-		} else {
-			document.querySelector(".pressure").style.color = `orange`;
-		}
-	}
-
-	document.querySelector(
-		".visibility",
-	).textContent = `${data.current.vis_miles} miles`;
-	if (data.current.vis_miles <= 2) {
-		if (data.current.vis_miles < 0.5) {
-			document.querySelector(".visibility").style.color = `#FF0000`;
-		} else {
-			document.querySelector(".visibility").style.color = `orange`;
-		}
-	}
-
 	document.querySelector(".uv").textContent = `${data.current.uv}`;
 	if (data.current.uv >= 11) {
 		document.querySelector(".uv").style.color = `#FF0000`;
 	} else if (data.current.uv >= 8) {
 		document.querySelector(".uv").style.color = `orange`;
-	}
-
-	document.querySelector(
-		".precipitation",
-	).textContent = `${data.current.precip_in} inches`;
-	if (data.current.precip_in >= 2) {
-		document.querySelector(".precipitation").style.color = `#6495ED`;
-	}
-
-	document.querySelector(".snow-depth").textContent = `${convertCmToInches(
-		data.forecast.forecastday[0].day.totalsnow_cm,
-	)} inches`;
-	if (convertCmToInches(data.forecast.forecastday[0].day.totalsnow_cm) >= 12) {
-		document.querySelector(".snow-depth").style.color = `#6495ED`;
 	}
 
 	document.querySelector(".cloud-cover").textContent = `${data.current.cloud}%`;
@@ -465,7 +567,7 @@ function buttons() {
 	const nextBtn = document.querySelector(".next-btn");
 	let isScrolling = false;
 	let scrollDirection = 0; // 0 for left, 1 for right
-	const scrollStep = 6; // Adjust this value to control the smoothness of the scroll
+	const scrollStep = 5.75; // Adjust this value to control the smoothness of the scroll
 
 	const animateScroll = () => {
 		if (!isScrolling) return;
@@ -520,9 +622,19 @@ async function getWeather(query) {
 		);
 		weatherData = await response.json();
 		console.log(weatherData);
-		displayWeatherData(weatherData);
-		createHourlyCard(weatherData);
-		buttons();
+		const unit = document.getElementById("unit-toggle").checked
+			? "metric"
+			: "imperial";
+		displayWeatherData(weatherData, unit);
+		if (
+			document.querySelector("input[name='forecast']:checked").value === "day"
+		) {
+			// eslint-disable-next-line no-use-before-define
+			showDayTab();
+		} else {
+			createHourlyCard(weatherData, unit);
+			buttons();
+		}
 	} catch (error) {
 		console.log(error);
 	}
@@ -881,5 +993,21 @@ function showDayTab() {
 	forecastSlider.innerHTML = "";
 }
 
+function changeUnits() {
+	const unit = document.getElementById("unit-toggle").checked
+		? "metric"
+		: "imperial";
+	displayWeatherData(weatherData, unit);
+	if (
+		document.querySelector("input[name='forecast']:checked").value === "day"
+	) {
+		// eslint-disable-next-line no-use-before-define
+		showDayTab();
+	} else {
+		createHourlyCard(weatherData, unit);
+		buttons();
+	}
+}
+
 export default pageLoad;
-export { getWeather, displayForecast, showHourlyTab, showDayTab };
+export { getWeather, displayForecast, showHourlyTab, showDayTab, changeUnits };

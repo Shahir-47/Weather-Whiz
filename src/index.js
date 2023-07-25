@@ -1,6 +1,11 @@
 import "./css/all.css";
 import "./css/normalize.css";
-import pageLoad, { getWeather, showHourlyTab, showDayTab } from "./js/UI";
+import pageLoad, {
+	getWeather,
+	showHourlyTab,
+	showDayTab,
+	changeUnits,
+} from "./js/UI";
 
 let previousScrollPosition = 0;
 pageLoad();
@@ -25,6 +30,10 @@ document.querySelector("#hourly").addEventListener("change", () => {
 		document.querySelector(".forecast-slider").scrollLeft =
 			previousScrollPosition;
 	}
+});
+
+document.getElementById("unit-toggle").addEventListener("change", () => {
+	changeUnits();
 });
 
 document.querySelector("#day").addEventListener("change", () => {
