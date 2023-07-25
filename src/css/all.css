@@ -432,6 +432,29 @@ input[type="radio"] {
 	filter: brightness(1.2);
 }
 
+.astro-card {
+	display: grid;
+	justify-items: center;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 1rem 0.25rem;
+	min-width: 150px;
+	border: 1px solid #dddddd;
+	border-radius: 15px;
+	background-color: #ffffff17;
+	justify-content: center;
+}
+
+.astro-card * {
+	margin: 0;
+}
+
+.long-text {
+	overflow-wrap: break-word;
+	font-size: 1.2rem;
+	max-width: 170px;
+}
+
 .daily-forecast {
 }
 

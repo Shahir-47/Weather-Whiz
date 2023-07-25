@@ -18,6 +18,8 @@ import raindrops from "../img/raindrops.svg";
 import snowCloud from "../img/snow-cloud.svg";
 import moon from "../img/moon/full-moon.svg";
 import cloud from "../img/cloud.svg";
+import sunsetIcon from "../img/sunsetIcon.svg";
+import morning from "../img/morning.svg";
 
 let weatherData = {};
 
@@ -29,13 +31,17 @@ const getAirQuality = (aqi) => {
 		return "Moderate";
 	}
 	if (aqi <= 150) {
+		document.querySelector(".air").style.color = "orange";
+		document.querySelector(".air").classList.add("long-text");
 		return "Unhealthy for Sensitive Groups";
 	}
 	if (aqi <= 200) {
+		document.querySelector(".air").style.color = "#FF0000";
 		return "Unhealthy";
 	}
 	if (aqi <= 300) {
-		return "Very Unhealthy";
+		document.querySelector(".air").style.color = "#FF0000";
+		return "Very Unhealthy!!!";
 	}
 	return "Hazardous";
 };
@@ -43,6 +49,7 @@ const getAirQuality = (aqi) => {
 function formatTime(time24) {
 	const [hours, minutes] = time24.split(":");
 	let suffix = "AM";
+	// eslint-disable-next-line radix
 	let hours12 = parseInt(hours);
 
 	if (hours12 >= 12) {
@@ -125,8 +132,32 @@ function makeHourlyCard(
 	return hourlyCard;
 }
 
+function createAstroCard(time, weatherIcon, text) {
+	const hourlyCard = document.createElement("div");
+	hourlyCard.classList.add("astro-card");
+
+	const hourlyTime = document.createElement("h3");
+	hourlyTime.classList.add("hourly-time");
+	hourlyTime.textContent = time;
+	hourlyCard.appendChild(hourlyTime);
+
+	const hourlyIcon = document.createElement("img");
+	hourlyIcon.classList.add("hourly-icon");
+	hourlyIcon.src = weatherIcon;
+	hourlyIcon.alt = "weather icon";
+	hourlyCard.appendChild(hourlyIcon);
+
+	const hourlyTemp = document.createElement("h4");
+	hourlyTemp.classList.add("hourly-temp");
+	hourlyTemp.textContent = text;
+	hourlyCard.appendChild(hourlyTemp);
+
+	return hourlyCard;
+}
+
 function createHourlyCard(data) {
 	const forecastSlider = document.querySelector(".forecast-slider");
+	forecastSlider.innerHTML = "";
 	const now = parse(data.location.localtime.slice(11, 16), "HH:mm", new Date());
 	let index = 0;
 	let totalCards = 0;
@@ -153,7 +184,30 @@ function createHourlyCard(data) {
 	totalCards += 1;
 
 	for (let i = index; i < 24; i += 1) {
+		let nextIndex = i + 1;
+		if (nextIndex === 24) {
+			nextIndex = 0;
+		}
+
+		const sunriseTime = parse(
+			data.forecast.forecastday[0].astro.sunrise,
+			"h:mm a",
+			new Date(),
+		);
+
+		const sunsetTime = parse(
+			data.forecast.forecastday[0].astro.sunset,
+			"h:mm a",
+			new Date(),
+		);
+
 		const time = data.forecast.forecastday[0].hour[i].time.slice(11, 16);
+		const timeFormat = parse(time, "HH:mm", new Date());
+		const nextTime = data.forecast.forecastday[0].hour[nextIndex].time.slice(
+			11,
+			16,
+		);
+		const nextTimeFormat = parse(nextTime, "HH:mm", new Date());
 		const iconImage = `./img/weather/${data.forecast.forecastday[0].hour[
 			i
 		].condition.icon.slice(29)}`;
@@ -161,6 +215,7 @@ function createHourlyCard(data) {
 		const condition = data.forecast.forecastday[0].hour[i].condition.text;
 		const rainChance = `${data.forecast.forecastday[0].hour[i].chance_of_rain}%`;
 		const snowChance = `${data.forecast.forecastday[0].hour[i].chance_of_snow}%`;
+
 		forecastSlider.appendChild(
 			makeHourlyCard(
 				time,
@@ -172,12 +227,58 @@ function createHourlyCard(data) {
 			),
 		);
 		totalCards += 1;
+
+		if (
+			compareAsc(sunriseTime, timeFormat) === 1 &&
+			compareAsc(nextTimeFormat, sunriseTime) === 1 &&
+			nextIndex !== 0
+		) {
+			forecastSlider.appendChild(
+				createAstroCard(
+					data.forecast.forecastday[0].astro.sunrise,
+					morning,
+					"Sunrise",
+				),
+			);
+		} else if (
+			compareAsc(sunsetTime, timeFormat) === 1 &&
+			compareAsc(nextTimeFormat, sunsetTime) === 1 &&
+			nextIndex !== 0
+		) {
+			forecastSlider.appendChild(
+				createAstroCard(
+					data.forecast.forecastday[0].astro.sunset,
+					sunsetIcon,
+					"Sunset",
+				),
+			);
+		}
 	}
 
 	console.log(totalCards);
 
 	for (let i = 0; i < 26 - totalCards; i += 1) {
+		let nextIndex = i + 1;
+		if (nextIndex === 24) {
+			nextIndex = 0;
+		}
 		const time = data.forecast.forecastday[1].hour[i].time.slice(11, 16);
+		const sunriseTime = parse(
+			data.forecast.forecastday[1].astro.sunrise,
+			"h:mm a",
+			new Date(),
+		);
+		const sunsetTime = parse(
+			data.forecast.forecastday[1].astro.sunset,
+			"h:mm a",
+			new Date(),
+		);
+		const timeFormat = parse(time, "HH:mm", new Date());
+		const nextTime = data.forecast.forecastday[1].hour[nextIndex].time.slice(
+			11,
+			16,
+		);
+		const nextTimeFormat = parse(nextTime, "HH:mm", new Date());
 		const iconImage = `./img/weather/${data.forecast.forecastday[1].hour[
 			i
 		].condition.icon.slice(29)}`;
@@ -185,6 +286,7 @@ function createHourlyCard(data) {
 		const condition = data.forecast.forecastday[1].hour[i].condition.text;
 		const rainChance = `${data.forecast.forecastday[1].hour[i].chance_of_rain}%`;
 		const snowChance = `${data.forecast.forecastday[1].hour[i].chance_of_snow}%`;
+
 		forecastSlider.appendChild(
 			makeHourlyCard(
 				time,
@@ -195,8 +297,38 @@ function createHourlyCard(data) {
 				snowChance,
 			),
 		);
+		if (
+			compareAsc(sunriseTime, timeFormat) === 1 &&
+			compareAsc(nextTimeFormat, sunriseTime) === 1 &&
+			nextIndex !== 0
+		) {
+			forecastSlider.appendChild(
+				createAstroCard(
+					data.forecast.forecastday[0].astro.sunrise,
+					morning,
+					"Sunrise",
+				),
+			);
+		} else if (
+			compareAsc(sunsetTime, timeFormat) === 1 &&
+			compareAsc(nextTimeFormat, sunsetTime) === 1 &&
+			nextIndex !== 0
+		) {
+			forecastSlider.appendChild(
+				createAstroCard(
+					data.forecast.forecastday[0].astro.sunset,
+					sunsetIcon,
+					"Sunset",
+				),
+			);
+		}
 	}
 	console.log(totalCards);
+}
+
+function convertCmToInches(cm) {
+	const inchesPerCm = 1 / 2.54;
+	return cm * inchesPerCm;
 }
 
 function displayWeatherData(data) {
@@ -205,14 +337,18 @@ function displayWeatherData(data) {
 	moonPhase = moonPhase.toLowerCase();
 
 	document.querySelector(".current-location").textContent = data.location.name;
+
 	document.querySelector(
 		".current-icon",
 	).src = `./img/weather/${data.current.condition.icon.slice(29)}`;
+
 	document.querySelector(
 		".current-temp",
 	).textContent = `${data.current.temp_f} °F`;
+
 	document.querySelector(".current-condition").textContent =
 		data.current.condition.text;
+
 	document.querySelector(
 		".current-min",
 	).textContent = `Min: ${data.forecast.forecastday[0].day.mintemp_f} °F`;
@@ -224,37 +360,92 @@ function displayWeatherData(data) {
 	document.querySelector(
 		".temp",
 	).textContent = `${data.current.feelslike_f} °F`;
+	if (data.current.feelslike_f > 80) {
+		document.querySelector(".temp").style.color = `#FF0000`;
+	} else if (data.current.feelslike_f < 50) {
+		document.querySelector(".temp").style.color = `#6495ED`;
+	}
+
 	document.querySelector(".humidity").textContent = `${data.current.humidity}%`;
+
 	document.querySelector(
 		".rain",
 	).textContent = `${data.forecast.forecastday[0].day.daily_chance_of_rain}%`;
+	if (data.forecast.forecastday[0].day.daily_chance_of_rain > 70) {
+		document.querySelector(".rain").style.color = `#6495ED`;
+	}
+
 	document.querySelector(".wind").textContent = `${data.current.wind_mph} mph`;
+	if (data.current.wind_mph > 25 && data.current.wind_mph < 38) {
+		document.querySelector(".wind").style.color = `orange`;
+	} else if (data.current.wind_mph > 38) {
+		document.querySelector(".wind").style.color = `#FF0000`;
+	}
+
 	document.querySelector(
 		".snow",
 	).textContent = `${data.forecast.forecastday[0].day.daily_chance_of_snow}%`;
+	if (data.forecast.forecastday[0].day.daily_chance_of_snow > 70) {
+		document.querySelector(".snow").style.color = `#6495ED`;
+	}
+
 	document.querySelector(".air").textContent = `${getAirQuality(
 		data.current.air_quality.pm2_5,
 	)}`;
+
 	document.querySelector(
 		".sunrise",
 	).textContent = `${data.forecast.forecastday[0].astro.sunrise}`;
+
 	document.querySelector(
 		".sunset",
 	).textContent = `${data.forecast.forecastday[0].astro.sunset}`;
+
 	document.querySelector(
 		".pressure",
 	).textContent = `${data.current.pressure_mb} mb`;
+	if (data.current.pressure_mb <= 1015) {
+		if (data.current.pressure_mb < 1000) {
+			document.querySelector(".pressure").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".pressure").style.color = `orange`;
+		}
+	}
+
 	document.querySelector(
 		".visibility",
 	).textContent = `${data.current.vis_miles} miles`;
+	if (data.current.vis_miles <= 2) {
+		if (data.current.vis_miles < 0.5) {
+			document.querySelector(".visibility").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".visibility").style.color = `orange`;
+		}
+	}
+
 	document.querySelector(".uv").textContent = `${data.current.uv}`;
+	if (data.current.uv >= 11) {
+		document.querySelector(".uv").style.color = `#FF0000`;
+	} else if (data.current.uv >= 8) {
+		document.querySelector(".uv").style.color = `orange`;
+	}
+
 	document.querySelector(
 		".precipitation",
-	).textContent = `${data.forecast.forecastday[0].day.totalprecip_in} inches`;
-	document.querySelector(
-		".snow-depth",
-	).textContent = `${data.forecast.forecastday[0].day.totalprecip_in} inches`;
+	).textContent = `${data.current.precip_in} inches`;
+	if (data.current.precip_in >= 2) {
+		document.querySelector(".precipitation").style.color = `#6495ED`;
+	}
+
+	document.querySelector(".snow-depth").textContent = `${convertCmToInches(
+		data.forecast.forecastday[0].day.totalsnow_cm,
+	)} inches`;
+	if (convertCmToInches(data.forecast.forecastday[0].day.totalsnow_cm) >= 12) {
+		document.querySelector(".snow-depth").style.color = `#6495ED`;
+	}
+
 	document.querySelector(".cloud-cover").textContent = `${data.current.cloud}%`;
+
 	document.querySelector(
 		".moon-phase",
 	).textContent = `${data.forecast.forecastday[0].astro.moon_phase}`;
@@ -329,7 +520,7 @@ async function getWeather(query) {
 		createHourlyCard(weatherData);
 		buttons();
 	} catch (error) {
-		displayWeatherData(error);
+		console.log(error);
 	}
 }
 
@@ -537,7 +728,9 @@ function displayMoreWeather() {
 	moreWeather.appendChild(
 		createIndivInfo(snowCloud, "Chance of Snow", "0%", "snow"),
 	);
-	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good", "air"));
+	moreWeather.appendChild(
+		createIndivInfo(visibility, "Visibility", "10 mi", "visibility"),
+	);
 	moreWeather.appendChild(
 		createIndivInfo(sunrise, "Sunrise", "6:00 AM", "sunrise"),
 	);
@@ -547,9 +740,7 @@ function displayMoreWeather() {
 	moreWeather.appendChild(
 		createIndivInfo(pressure, "Pressure", "1000 mb", "pressure"),
 	);
-	moreWeather.appendChild(
-		createIndivInfo(visibility, "Visibility", "10 mi", "visibility"),
-	);
+	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good", "air"));
 	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0", "uv"));
 	moreWeather.appendChild(
 		createIndivInfo(raindrops, "Precipitation", "0 in", "precipitation"),
@@ -656,7 +847,7 @@ function pageLoad() {
 	makeMainContainer();
 	bottomContainer();
 	makeHourlyForecast();
-	getWeather("Los Angeles");
+	getWeather("Australia");
 }
 
 function displayForecast() {
