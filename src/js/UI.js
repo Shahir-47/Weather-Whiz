@@ -40,6 +40,21 @@ const getAirQuality = (aqi) => {
 	return "Hazardous";
 };
 
+function formatTime(time24) {
+	const [hours, minutes] = time24.split(":");
+	let suffix = "AM";
+	let hours12 = parseInt(hours);
+
+	if (hours12 >= 12) {
+		suffix = "PM";
+		hours12 = hours12 === 12 ? 12 : hours12 - 12;
+	} else {
+		hours12 = hours12 === 0 ? 12 : hours12;
+	}
+
+	return `${hours12}:${minutes} ${suffix}`;
+}
+
 function makeHourlyCard(
 	time,
 	weatherIcon,
@@ -53,7 +68,7 @@ function makeHourlyCard(
 
 	const hourlyTime = document.createElement("h3");
 	hourlyTime.classList.add("hourly-time");
-	hourlyTime.textContent = time;
+	hourlyTime.textContent = time === "Now" ? time : formatTime(time);
 	hourlyCard.appendChild(hourlyTime);
 
 	const hourlyIcon = document.createElement("img");
@@ -159,7 +174,9 @@ function createHourlyCard(data) {
 		totalCards += 1;
 	}
 
-	for (let i = 0; i < 24 - totalCards; i += 1) {
+	console.log(totalCards);
+
+	for (let i = 0; i < 26 - totalCards; i += 1) {
 		const time = data.forecast.forecastday[1].hour[i].time.slice(11, 16);
 		const iconImage = `./img/weather/${data.forecast.forecastday[1].hour[
 			i
@@ -179,6 +196,7 @@ function createHourlyCard(data) {
 			),
 		);
 	}
+	console.log(totalCards);
 }
 
 function displayWeatherData(data) {
@@ -246,6 +264,59 @@ function displayWeatherData(data) {
 	).src = `./img/moon/${moonPhase}.svg`;
 }
 
+function buttons() {
+	const cardsWrapper = document.querySelector(".forecast-slider");
+	const backBtn = document.querySelector(".back-btn");
+	const nextBtn = document.querySelector(".next-btn");
+	let isScrolling = false;
+	let scrollDirection = 0; // 0 for left, 1 for right
+	const scrollStep = 6; // Adjust this value to control the smoothness of the scroll
+
+	const animateScroll = () => {
+		if (!isScrolling) return;
+
+		const scrollDistance = scrollDirection === 0 ? -scrollStep : scrollStep;
+		cardsWrapper.scrollLeft += scrollDistance;
+
+		if (
+			(scrollDirection === 0 && cardsWrapper.scrollLeft > 0) ||
+			(scrollDirection === 1 &&
+				cardsWrapper.scrollLeft + cardsWrapper.offsetWidth <
+					cardsWrapper.scrollWidth)
+		) {
+			requestAnimationFrame(animateScroll);
+		} else {
+			isScrolling = false;
+		}
+	};
+
+	const scrollLeft = () => {
+		if (!isScrolling) {
+			scrollDirection = 0;
+			isScrolling = true;
+			animateScroll();
+		}
+	};
+
+	const scrollRight = () => {
+		if (!isScrolling) {
+			scrollDirection = 1;
+			isScrolling = true;
+			animateScroll();
+		}
+	};
+
+	const stopScroll = () => {
+		isScrolling = false;
+	};
+
+	backBtn.addEventListener("mouseenter", scrollLeft);
+	backBtn.addEventListener("mouseleave", stopScroll); // Stop scrolling on mouse leave
+
+	nextBtn.addEventListener("mouseenter", scrollRight);
+	nextBtn.addEventListener("mouseleave", stopScroll); // Stop scrolling on mouse leave
+}
+
 async function getWeather(query) {
 	try {
 		const response = await fetch(
@@ -256,6 +327,7 @@ async function getWeather(query) {
 		console.log(weatherData);
 		displayWeatherData(weatherData);
 		createHourlyCard(weatherData);
+		buttons();
 	} catch (error) {
 		displayWeatherData(error);
 	}
