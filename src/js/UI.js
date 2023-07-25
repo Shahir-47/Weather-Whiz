@@ -388,6 +388,8 @@ function displayWeatherData(data, unit) {
 			document.querySelector(".temp").style.color = `#FF0000`;
 		} else if (data.current.feelslike_f < 50) {
 			document.querySelector(".temp").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".temp").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -397,6 +399,8 @@ function displayWeatherData(data, unit) {
 			document.querySelector(".wind").style.color = `orange`;
 		} else if (data.current.wind_mph > 38) {
 			document.querySelector(".wind").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".wind").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -408,6 +412,8 @@ function displayWeatherData(data, unit) {
 			} else {
 				document.querySelector(".pressure").style.color = `orange`;
 			}
+		} else {
+			document.querySelector(".pressure").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -419,6 +425,8 @@ function displayWeatherData(data, unit) {
 			} else {
 				document.querySelector(".visibility").style.color = `orange`;
 			}
+		} else {
+			document.querySelector(".visibility").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -426,6 +434,8 @@ function displayWeatherData(data, unit) {
 		).textContent = `${data.current.precip_in} inches`;
 		if (data.current.precip_in >= 2) {
 			document.querySelector(".precipitation").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".precipitation").style.color = `#dddddd`;
 		}
 
 		document.querySelector(".snow-depth").textContent = `${convertCmToInches(
@@ -435,6 +445,8 @@ function displayWeatherData(data, unit) {
 			convertCmToInches(data.forecast.forecastday[0].day.totalsnow_cm) >= 12
 		) {
 			document.querySelector(".snow-depth").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".snow-depth").style.color = `#dddddd`;
 		}
 	} else {
 		document.querySelector(
@@ -456,6 +468,8 @@ function displayWeatherData(data, unit) {
 			document.querySelector(".temp").style.color = `#FF0000`;
 		} else if (data.current.feelslike_c < 10) {
 			document.querySelector(".temp").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".temp").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -465,6 +479,8 @@ function displayWeatherData(data, unit) {
 			document.querySelector(".wind").style.color = `orange`;
 		} else if (data.current.wind_kph > 61.152) {
 			document.querySelector(".wind").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".wind").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -476,6 +492,8 @@ function displayWeatherData(data, unit) {
 			} else {
 				document.querySelector(".pressure").style.color = `orange`;
 			}
+		} else {
+			document.querySelector(".pressure").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -487,6 +505,8 @@ function displayWeatherData(data, unit) {
 			} else {
 				document.querySelector(".visibility").style.color = `orange`;
 			}
+		} else {
+			document.querySelector(".visibility").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -494,6 +514,8 @@ function displayWeatherData(data, unit) {
 		).textContent = `${data.current.precip_mm} mm`;
 		if (data.current.precip_mm >= 50.8) {
 			document.querySelector(".precipitation").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".precipitation").style.color = `#dddddd`;
 		}
 
 		document.querySelector(
@@ -501,6 +523,8 @@ function displayWeatherData(data, unit) {
 		).textContent = `${data.forecast.forecastday[0].day.totalsnow_cm} cm`;
 		if (data.forecast.forecastday[0].day.totalsnow_cm >= 30.48) {
 			document.querySelector(".snow-depth").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".snow-depth").style.color = `#dddddd`;
 		}
 	}
 

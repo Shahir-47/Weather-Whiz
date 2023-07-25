@@ -283,6 +283,8 @@ footer img {
 
 .current-icon {
 	min-width: 7rem;
+	width: 7rem;
+	max-width: 7rem;
 	height: auto;
 }
 
