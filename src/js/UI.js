@@ -23,6 +23,8 @@ import morning from "../img/morning.svg";
 
 let weatherData = {};
 
+// --------------------------------- Helper Methods to display data --------------------------------- //
+
 const getAirQuality = (aqi) => {
 	if (aqi <= 50) {
 		return "Good";
@@ -60,6 +62,36 @@ function formatTime(time24) {
 	}
 
 	return `${hours12}:${minutes} ${suffix}`;
+}
+
+function convertCmToInches(cm) {
+	const inchesPerCm = 1 / 2.54;
+	return cm * inchesPerCm;
+}
+
+// --------------------------------- Display Data from API --------------------------------- //
+
+function createAstroCard(time, weatherIcon, text) {
+	const hourlyCard = document.createElement("div");
+	hourlyCard.classList.add("astro-card");
+
+	const hourlyTime = document.createElement("h3");
+	hourlyTime.classList.add("hourly-time");
+	hourlyTime.textContent = time;
+	hourlyCard.appendChild(hourlyTime);
+
+	const hourlyIcon = document.createElement("img");
+	hourlyIcon.classList.add("hourly-icon");
+	hourlyIcon.src = weatherIcon;
+	hourlyIcon.alt = "weather icon";
+	hourlyCard.appendChild(hourlyIcon);
+
+	const hourlyTemp = document.createElement("h4");
+	hourlyTemp.classList.add("hourly-temp");
+	hourlyTemp.textContent = text;
+	hourlyCard.appendChild(hourlyTemp);
+
+	return hourlyCard;
 }
 
 function makeHourlyCard(
@@ -128,29 +160,6 @@ function makeHourlyCard(
 	moreInfo.appendChild(moreInfoSnow);
 
 	hourlyCard.appendChild(moreInfo);
-
-	return hourlyCard;
-}
-
-function createAstroCard(time, weatherIcon, text) {
-	const hourlyCard = document.createElement("div");
-	hourlyCard.classList.add("astro-card");
-
-	const hourlyTime = document.createElement("h3");
-	hourlyTime.classList.add("hourly-time");
-	hourlyTime.textContent = time;
-	hourlyCard.appendChild(hourlyTime);
-
-	const hourlyIcon = document.createElement("img");
-	hourlyIcon.classList.add("hourly-icon");
-	hourlyIcon.src = weatherIcon;
-	hourlyIcon.alt = "weather icon";
-	hourlyCard.appendChild(hourlyIcon);
-
-	const hourlyTemp = document.createElement("h4");
-	hourlyTemp.classList.add("hourly-temp");
-	hourlyTemp.textContent = text;
-	hourlyCard.appendChild(hourlyTemp);
 
 	return hourlyCard;
 }
@@ -324,11 +333,6 @@ function createHourlyCard(data) {
 		}
 	}
 	console.log(totalCards);
-}
-
-function convertCmToInches(cm) {
-	const inchesPerCm = 1 / 2.54;
-	return cm * inchesPerCm;
 }
 
 function displayWeatherData(data) {
@@ -523,6 +527,8 @@ async function getWeather(query) {
 		console.log(error);
 	}
 }
+
+// ---------------------------------------------- Display UI ---------------------------------------- //
 
 function displayNavBar() {
 	const navBar = document.createElement("div");
