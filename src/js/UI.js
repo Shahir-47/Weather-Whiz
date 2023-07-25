@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { parse, compareAsc } from "date-fns";
 import icon from "../img/icon.svg";
 import search from "../img/search.svg";
 import GitHub from "../img/git.svg";
@@ -37,6 +39,147 @@ const getAirQuality = (aqi) => {
 	}
 	return "Hazardous";
 };
+
+function makeHourlyCard(
+	time,
+	weatherIcon,
+	tempInfo,
+	condition,
+	rainChance,
+	snowChance,
+) {
+	const hourlyCard = document.createElement("div");
+	hourlyCard.classList.add("hourly-card");
+
+	const hourlyTime = document.createElement("h3");
+	hourlyTime.classList.add("hourly-time");
+	hourlyTime.textContent = time;
+	hourlyCard.appendChild(hourlyTime);
+
+	const hourlyIcon = document.createElement("img");
+	hourlyIcon.classList.add("hourly-icon");
+	hourlyIcon.src = weatherIcon;
+	hourlyIcon.alt = "weather icon";
+	hourlyCard.appendChild(hourlyIcon);
+
+	const hourlyTemp = document.createElement("h4");
+	hourlyTemp.classList.add("hourly-temp");
+	hourlyTemp.textContent = tempInfo;
+	hourlyCard.appendChild(hourlyTemp);
+
+	const hourlyCondition = document.createElement("h5");
+	hourlyCondition.classList.add("hourly-condition");
+	hourlyCondition.textContent = condition;
+	hourlyCard.appendChild(hourlyCondition);
+
+	const moreInfo = document.createElement("div");
+	moreInfo.classList.add("more-info-hourly");
+
+	const moreInfoRain = document.createElement("div");
+	moreInfoRain.classList.add("more-info-rain");
+
+	const moreInfoRainIcon = document.createElement("img");
+	moreInfoRainIcon.classList.add("more-info-rain-icon");
+	moreInfoRainIcon.src = rain;
+	moreInfoRainIcon.alt = "rain icon";
+	moreInfoRain.appendChild(moreInfoRainIcon);
+
+	const moreInfoRainText = document.createElement("h6");
+	moreInfoRainText.classList.add("more-info-rain-text");
+	moreInfoRainText.textContent = rainChance;
+	moreInfoRain.appendChild(moreInfoRainText);
+	moreInfo.appendChild(moreInfoRain);
+
+	const moreInfoSnow = document.createElement("div");
+	moreInfoSnow.classList.add("more-info-snow");
+
+	const moreInfoSnowIcon = document.createElement("img");
+	moreInfoSnowIcon.classList.add("more-info-snow-icon");
+	moreInfoSnowIcon.src = snow;
+	moreInfoSnowIcon.alt = "snow icon";
+	moreInfoSnow.appendChild(moreInfoSnowIcon);
+
+	const moreInfoSnowText = document.createElement("h6");
+	moreInfoSnowText.classList.add("more-info-snow-text");
+	moreInfoSnowText.textContent = snowChance;
+	moreInfoSnow.appendChild(moreInfoSnowText);
+	moreInfo.appendChild(moreInfoSnow);
+
+	hourlyCard.appendChild(moreInfo);
+
+	return hourlyCard;
+}
+
+function createHourlyCard(data) {
+	const forecastSlider = document.querySelector(".forecast-slider");
+	const now = parse(data.location.localtime.slice(11, 16), "HH:mm", new Date());
+	let index = 0;
+	let totalCards = 0;
+
+	data.forecast.forecastday[0].hour.every((hour, i) => {
+		const time = parse(hour.time.slice(11, 16), "HH:mm", new Date());
+		if (compareAsc(now, time) === -1) {
+			index = i;
+			return false;
+		}
+		return true;
+	});
+
+	forecastSlider.appendChild(
+		makeHourlyCard(
+			"Now",
+			`./img/weather/${data.current.condition.icon.slice(29)}`,
+			`${data.current.temp_f} °F`,
+			data.current.condition.text,
+			`${data.forecast.forecastday[0].day.daily_chance_of_rain}%`,
+			`${data.forecast.forecastday[0].day.daily_chance_of_snow}%`,
+		),
+	);
+	totalCards += 1;
+
+	for (let i = index; i < 24; i += 1) {
+		const time = data.forecast.forecastday[0].hour[i].time.slice(11, 16);
+		const iconImage = `./img/weather/${data.forecast.forecastday[0].hour[
+			i
+		].condition.icon.slice(29)}`;
+		const temperature = `${data.forecast.forecastday[0].hour[i].temp_f} °F`;
+		const condition = data.forecast.forecastday[0].hour[i].condition.text;
+		const rainChance = `${data.forecast.forecastday[0].hour[i].chance_of_rain}%`;
+		const snowChance = `${data.forecast.forecastday[0].hour[i].chance_of_snow}%`;
+		forecastSlider.appendChild(
+			makeHourlyCard(
+				time,
+				iconImage,
+				temperature,
+				condition,
+				rainChance,
+				snowChance,
+			),
+		);
+		totalCards += 1;
+	}
+
+	for (let i = 0; i < 24 - totalCards; i += 1) {
+		const time = data.forecast.forecastday[1].hour[i].time.slice(11, 16);
+		const iconImage = `./img/weather/${data.forecast.forecastday[1].hour[
+			i
+		].condition.icon.slice(29)}`;
+		const temperature = `${data.forecast.forecastday[1].hour[i].temp_f} °F`;
+		const condition = data.forecast.forecastday[1].hour[i].condition.text;
+		const rainChance = `${data.forecast.forecastday[1].hour[i].chance_of_rain}%`;
+		const snowChance = `${data.forecast.forecastday[1].hour[i].chance_of_snow}%`;
+		forecastSlider.appendChild(
+			makeHourlyCard(
+				time,
+				iconImage,
+				temperature,
+				condition,
+				rainChance,
+				snowChance,
+			),
+		);
+	}
+}
 
 function displayWeatherData(data) {
 	let moonPhase = data.forecast.forecastday[0].astro.moon_phase;
@@ -112,6 +255,7 @@ async function getWeather(query) {
 		weatherData = await response.json();
 		console.log(weatherData);
 		displayWeatherData(weatherData);
+		createHourlyCard(weatherData);
 	} catch (error) {
 		displayWeatherData(error);
 	}
@@ -387,69 +531,6 @@ function chooseForecast() {
 	return container;
 }
 
-function makeHourlyCard() {
-	const hourlyCard = document.createElement("div");
-	hourlyCard.classList.add("hourly-card");
-
-	const hourlyTime = document.createElement("h3");
-	hourlyTime.classList.add("hourly-time");
-	hourlyTime.textContent = "12:00 PM";
-	hourlyCard.appendChild(hourlyTime);
-
-	const hourlyIcon = document.createElement("img");
-	hourlyIcon.classList.add("hourly-icon");
-	hourlyIcon.src = icon;
-	hourlyIcon.alt = "weather icon";
-	hourlyCard.appendChild(hourlyIcon);
-
-	const hourlyTemp = document.createElement("h4");
-	hourlyTemp.classList.add("hourly-temp");
-	hourlyTemp.textContent = "83 °F";
-	hourlyCard.appendChild(hourlyTemp);
-
-	const hourlyCondition = document.createElement("h5");
-	hourlyCondition.classList.add("hourly-condition");
-	hourlyCondition.textContent = "Sunny";
-	hourlyCard.appendChild(hourlyCondition);
-
-	const moreInfo = document.createElement("div");
-	moreInfo.classList.add("more-info-hourly");
-
-	const moreInfoRain = document.createElement("div");
-	moreInfoRain.classList.add("more-info-rain");
-
-	const moreInfoRainIcon = document.createElement("img");
-	moreInfoRainIcon.classList.add("more-info-rain-icon");
-	moreInfoRainIcon.src = rain;
-	moreInfoRainIcon.alt = "rain icon";
-	moreInfoRain.appendChild(moreInfoRainIcon);
-
-	const moreInfoRainText = document.createElement("h6");
-	moreInfoRainText.classList.add("more-info-rain-text");
-	moreInfoRainText.textContent = "0%";
-	moreInfoRain.appendChild(moreInfoRainText);
-	moreInfo.appendChild(moreInfoRain);
-
-	const moreInfoSnow = document.createElement("div");
-	moreInfoSnow.classList.add("more-info-snow");
-
-	const moreInfoSnowIcon = document.createElement("img");
-	moreInfoSnowIcon.classList.add("more-info-snow-icon");
-	moreInfoSnowIcon.src = snow;
-	moreInfoSnowIcon.alt = "snow icon";
-	moreInfoSnow.appendChild(moreInfoSnowIcon);
-
-	const moreInfoSnowText = document.createElement("h6");
-	moreInfoSnowText.classList.add("more-info-snow-text");
-	moreInfoSnowText.textContent = "0%";
-	moreInfoSnow.appendChild(moreInfoSnowText);
-	moreInfo.appendChild(moreInfoSnow);
-
-	hourlyCard.appendChild(moreInfo);
-
-	return hourlyCard;
-}
-
 function makeHourlyForecast() {
 	const forecast = document.querySelector(".forecast");
 
@@ -461,10 +542,6 @@ function makeHourlyForecast() {
 	const forecastSlider = document.createElement("div");
 	forecastSlider.classList.add("forecast-slider");
 	forecast.appendChild(forecastSlider);
-
-	for (let i = 0; i < 24; i += 1) {
-		forecastSlider.appendChild(makeHourlyCard());
-	}
 
 	const nextBtn = document.createElement("button");
 	nextBtn.classList.add("next-btn");
