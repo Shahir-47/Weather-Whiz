@@ -871,5 +871,15 @@ function displayForecast() {
 	}
 }
 
+function showHourlyTab() {
+	createHourlyCard(weatherData);
+	buttons();
+}
+
+function showDayTab() {
+	const forecastSlider = document.querySelector(".forecast-slider");
+	forecastSlider.innerHTML = "";
+}
+
 export default pageLoad;
-export { getWeather, displayForecast };
+export { getWeather, displayForecast, showHourlyTab, showDayTab };

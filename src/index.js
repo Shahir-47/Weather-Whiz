@@ -1,7 +1,8 @@
 import "./css/all.css";
 import "./css/normalize.css";
-import pageLoad, { getWeather, displayForecast } from "./js/UI";
+import pageLoad, { getWeather, showHourlyTab, showDayTab } from "./js/UI";
 
+let previousScrollPosition = 0;
 pageLoad();
 
 // Event Listeners if search button is clicked
@@ -19,9 +20,17 @@ document.querySelector(".search-input").addEventListener("keyup", (e) => {
 });
 
 document.querySelector("#hourly").addEventListener("change", () => {
-	displayForecast();
+	if (document.querySelector("#hourly").checked) {
+		showHourlyTab();
+		document.querySelector(".forecast-slider").scrollLeft =
+			previousScrollPosition;
+	}
 });
 
 document.querySelector("#day").addEventListener("change", () => {
-	displayForecast();
+	if (document.querySelector("#day").checked) {
+		previousScrollPosition =
+			document.querySelector(".forecast-slider").scrollLeft;
+		showDayTab();
+	}
 });
