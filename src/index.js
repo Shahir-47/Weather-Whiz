@@ -4,33 +4,18 @@ import pageLoad, { getWeather, displayForecast } from "./js/UI";
 
 pageLoad();
 
-const cardsWrapper = document.querySelector(".forecast-slider");
-const backBtn = document.querySelector(".back-btn");
-const nextBtn = document.querySelector(".next-btn");
-const cardWidth = 151.6;
-
-const scrollLeft = () => {
-	const scrollOptions = {
-		left: cardsWrapper.scrollLeft - cardWidth,
-		behavior: "smooth",
-	};
-	cardsWrapper.scrollTo(scrollOptions);
-};
-
-const scrollRight = () => {
-	const scrollOptions = {
-		left: cardsWrapper.scrollLeft + cardWidth,
-		behavior: "smooth",
-	};
-	cardsWrapper.scrollTo(scrollOptions);
-};
-
-backBtn.addEventListener("click", scrollLeft);
-nextBtn.addEventListener("click", scrollRight);
-
+// Event Listeners if search button is clicked
 document.querySelector(".search-button").addEventListener("click", () => {
 	const query = document.querySelector(".search-input").value;
 	getWeather(query);
+});
+
+// Event Listeners if enter key is pressed on search input
+document.querySelector(".search-input").addEventListener("keyup", (e) => {
+	if (e.keyCode === 13) {
+		const query = document.querySelector(".search-input").value;
+		getWeather(query);
+	}
 });
 
 document.querySelector("#hourly").addEventListener("change", () => {
