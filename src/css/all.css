@@ -465,7 +465,7 @@ input[type="radio"] {
 	justify-items: center;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 1rem 0.25rem;
+	margin: 0.5rem 0;
 	min-width: 150px;
 	border: 1px solid #dddddd;
 	border-radius: 15px;
@@ -474,6 +474,7 @@ input[type="radio"] {
 	transform: rotateX(180deg);
 	-ms-transform: rotateX(180deg); /* IE 9 */
 	-webkit-transform: rotateX(180deg); /* Safari and Chrome */
+	padding: 0.25rem 0;
 }
 
 .astro-card * {
@@ -510,7 +511,7 @@ input[type="radio"] {
 .forecast-slider {
 	display: flex;
 	overflow-x: auto;
-	gap: 1rem;
+	gap: 2rem;
 	padding: 0 1rem;
 	transform: rotateX(180deg);
 	-ms-transform: rotateX(180deg); /* IE 9 */
@@ -550,7 +551,7 @@ input[type="radio"] {
 	justify-content: center;
 	align-items: center;
 	gap: 0.5rem;
-	margin: 1rem 0.25rem;
+	margin: 0.5rem 0;
 	min-width: 150px;
 	border: 1px solid #dddddd;
 	border-radius: 15px;
@@ -560,6 +561,7 @@ input[type="radio"] {
 	transform: rotateX(180deg);
 	-ms-transform: rotateX(180deg); /* IE 9 */
 	-webkit-transform: rotateX(180deg); /* Safari and Chrome */
+	padding: 0.25rem 0;
 }
 
 .hourly-card:hover {
