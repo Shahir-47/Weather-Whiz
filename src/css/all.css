@@ -460,6 +460,20 @@ input[type="radio"] {
 	filter: brightness(1.2);
 }
 
+.last-updated {
+	font-weight: 100;
+	font-size: 0.8rem;
+	font-style: italic;
+	margin: 0;
+	position: absolute; /* Position the element absolutely within the container */
+	padding: 0.625rem; /* Optional: Add padding to the top element if desired */
+	color: #ffffffad;
+	width: -moz-available; /* WebKit-based browsers will ignore this. */
+	width: -webkit-fill-available; /* Mozilla-based browsers will ignore this. */
+	width: fill-available;
+	text-align: center;
+}
+
 .astro-card {
 	display: grid;
 	justify-items: center;

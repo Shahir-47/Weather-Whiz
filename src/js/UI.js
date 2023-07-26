@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { parse, compareAsc } from "date-fns";
+import { parse, format, compareAsc } from "date-fns";
 import icon from "../img/icon.svg";
 import search from "../img/search.svg";
 import GitHub from "../img/git.svg";
@@ -22,6 +22,7 @@ import sunsetIcon from "../img/sunsetIcon.svg";
 import morning from "../img/morning.svg";
 
 let weatherData = {};
+let lastUpdatedTime = new Date();
 
 // --------------------------------- Helper Methods to display data --------------------------------- //
 
@@ -62,6 +63,11 @@ function formatTime(time24) {
 	}
 
 	return `${hours12}:${minutes} ${suffix}`;
+}
+
+function formatDate(date) {
+	const formattedDate = format(date, "MMM do, yyyy 'at' h:mm a");
+	return `Last updated on ${formattedDate}.`;
 }
 
 function convertCmToInches(cm) {
@@ -365,6 +371,9 @@ function createHourlyCard(data, unit) {
 }
 
 function displayWeatherData(data, unit) {
+	const lastUpdated = document.querySelector(".last-updated");
+	lastUpdated.textContent = formatDate(lastUpdatedTime);
+
 	if (countWords(data.current.condition.text) >= 6) {
 		document.querySelector(".current-condition").classList.add("info-length");
 	} else if (countWords(data.current.condition.text) >= 3) {
@@ -657,6 +666,7 @@ async function getWeather(query) {
 		);
 		weatherData = await response.json();
 		console.log(weatherData);
+		lastUpdatedTime = new Date();
 		const unit = document.getElementById("unit-toggle").checked
 			? "metric"
 			: "imperial";
@@ -788,9 +798,17 @@ function displayNavBar() {
 	return navBar;
 }
 
+function showLastUpdated() {
+	const lastUpdated = document.createElement("p");
+	lastUpdated.classList.add("last-updated");
+	lastUpdated.textContent = "Last Updated: 8/21/2021";
+	return lastUpdated;
+}
+
 function makePageContainer() {
 	const pageContainer = document.createElement("div");
 	pageContainer.classList.add("page-container");
+	pageContainer.appendChild(showLastUpdated());
 	return pageContainer;
 }
 
