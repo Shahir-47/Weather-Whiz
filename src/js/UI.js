@@ -134,6 +134,9 @@ function makeHourlyCard(
 	hourlyCondition.classList.add("hourly-condition");
 	hourlyCondition.textContent = condition;
 	hourlyCard.appendChild(hourlyCondition);
+	if (countWords(condition) >= 3) {
+		hourlyCondition.classList.add("hourly-long");
+	}
 
 	const moreInfo = document.createElement("div");
 	moreInfo.classList.add("more-info-hourly");
@@ -532,7 +535,13 @@ function displayWeatherData(data, unit) {
 	moonPhase = moonPhase.replace(" ", "-");
 	moonPhase = moonPhase.toLowerCase();
 
-	document.querySelector(".current-location").textContent = data.location.name;
+	let location;
+	if (data.location.name.length > 17) {
+		location = `${data.location.name.slice(0, 17)}...`;
+	} else {
+		location = data.location.name;
+	}
+	document.querySelector(".current-location").textContent = location;
 
 	document.querySelector(
 		".current-icon",
@@ -666,6 +675,46 @@ async function getWeather(query) {
 	}
 }
 
+async function fetchCities(searchText) {
+	try {
+		const accessToken =
+			"pk.eyJ1Ijoic2hhaGlyLTQ3IiwiYSI6ImNsa2p1aWt6ajB4d20zbXJ6amVncnZ5MjAifQ.ohb466lrBmtSYDD40x3llg";
+		const apiUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+			searchText,
+		)}.json?access_token=${accessToken}&types=place&limit=10`;
+
+		const response = await fetch(apiUrl);
+		const data = await response.json();
+		return data.features.map((feature) => feature.text);
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+async function displaySuggestions(predictions) {
+	const suggestionsDiv = document.querySelector(".suggestions");
+	const searchInput = document.querySelector(".search-box");
+	// Clear the previous suggestions
+	suggestionsDiv.innerHTML = "";
+	searchInput.classList.add("active");
+
+	// Create and display the suggestion list
+	const suggestionList = document.createElement("ul");
+	predictions.forEach((prediction) => {
+		const listItem = document.createElement("li");
+		listItem.textContent = prediction;
+		listItem.addEventListener("click", () => {
+			// When the user clicks on a suggestion, display its forecast
+			suggestionsDiv.innerHTML = "";
+			searchInput.classList.remove("active");
+			document.querySelector(".search-input").value = "";
+			getWeather(prediction);
+		});
+		suggestionList.appendChild(listItem);
+	});
+	suggestionsDiv.appendChild(suggestionList);
+}
+
 // ---------------------------------------------- Display UI ---------------------------------------- //
 
 function displayNavBar() {
@@ -685,6 +734,8 @@ function displayNavBar() {
 	navBar.appendChild(logoBox);
 
 	// search bar
+	const searchContainer = document.createElement("div");
+	searchContainer.classList.add("search-container");
 	const searchBox = document.createElement("div");
 	searchBox.classList.add("search-box");
 	const searchInput = document.createElement("input");
@@ -693,6 +744,9 @@ function displayNavBar() {
 	searchInput.placeholder = "Search";
 	searchInput.id = "search";
 	searchInput.name = "search";
+	searchInput.setAttribute("autocorrect", "off");
+	searchInput.setAttribute("autocapitalize", "none");
+	searchInput.setAttribute("autocomplete", "off");
 	searchBox.appendChild(searchInput);
 	const searchButton = document.createElement("button");
 	searchButton.classList.add("search-button");
@@ -701,7 +755,11 @@ function displayNavBar() {
 	searchIcon.src = search;
 	searchIcon.alt = "Search icon";
 	searchButton.appendChild(searchIcon);
-	navBar.appendChild(searchBox);
+	const suggestions = document.createElement("div");
+	suggestions.classList.add("suggestions");
+	searchContainer.appendChild(searchBox);
+	searchContainer.appendChild(suggestions);
+	navBar.appendChild(searchContainer);
 
 	// toggle switch for imperial/metric units
 	const toggleBox = document.createElement("div");
@@ -1036,4 +1094,12 @@ function changeUnits() {
 }
 
 export default pageLoad;
-export { getWeather, displayForecast, showHourlyTab, showDayTab, changeUnits };
+export {
+	getWeather,
+	displayForecast,
+	showHourlyTab,
+	showDayTab,
+	changeUnits,
+	fetchCities,
+	displaySuggestions,
+};

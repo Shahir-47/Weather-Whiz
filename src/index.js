@@ -5,6 +5,8 @@ import pageLoad, {
 	showHourlyTab,
 	showDayTab,
 	changeUnits,
+	fetchCities,
+	displaySuggestions,
 } from "./js/UI";
 
 let previousScrollPosition = 0;
@@ -41,5 +43,25 @@ document.querySelector("#day").addEventListener("change", () => {
 		previousScrollPosition =
 			document.querySelector(".forecast-slider").scrollLeft;
 		showDayTab();
+	}
+});
+
+const searchInput = document.querySelector(".search-input");
+searchInput.addEventListener("input", async () => {
+	const searchBox = document.querySelector(".search-box");
+	const suggestionsDiv = document.querySelector(".suggestions");
+	const searchText = searchInput.value.trim();
+	if (searchText.length > 0) {
+		try {
+			// Show the autocomplete predictions based on the user's input
+			const predictions = await fetchCities(searchText);
+			await displaySuggestions(predictions);
+		} catch (error) {
+			console.error("Error fetching cities:", error);
+		}
+	} else {
+		// Clear the suggestions if the input is empty
+		suggestionsDiv.innerHTML = "";
+		searchBox.classList.remove("active");
 	}
 });
