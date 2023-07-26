@@ -685,7 +685,8 @@ async function fetchCities(searchText) {
 
 		const response = await fetch(apiUrl);
 		const data = await response.json();
-		return data.features.map((feature) => feature.text);
+		console.log(data);
+		return data.features.map((feature) => feature.place_name);
 	} catch (error) {
 		console.log(error);
 	}
