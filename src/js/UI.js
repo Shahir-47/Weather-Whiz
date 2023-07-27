@@ -23,6 +23,7 @@ import sunsetIcon from "../img/sunsetIcon.svg";
 import morning from "../img/morning.svg";
 import copy from "../img/copy.svg";
 import load from "../img/load.gif";
+import sad from "../img/sad.svg";
 
 let weatherData = {};
 let lastUpdatedTime = new Date();
@@ -446,6 +447,9 @@ function createDayCard(data, unit) {
 
 function displayWeatherData(data, unit) {
 	const lastUpdated = document.querySelector(".last-updated-text");
+	if (lastUpdated === null) {
+		return;
+	}
 	lastUpdated.textContent = formatDate(lastUpdatedTime);
 
 	if (countWords(data.current.condition.text) >= 6) {
@@ -747,8 +751,9 @@ async function getWeather(query) {
 			: "imperial";
 		displayWeatherData(weatherData, unit);
 		displayForecast();
+		// eslint-disable-next-line no-shadow
 	} catch (error) {
-		console.log(error);
+		errorPage();
 	}
 }
 
@@ -870,6 +875,10 @@ function displayNavBar() {
 	logoBox.appendChild(logo);
 	logoBox.appendChild(logoText);
 	navBar.appendChild(logoBox);
+
+	logoBox.addEventListener("click", () => {
+		window.location.reload();
+	});
 
 	// search bar
 	const searchContainer = document.createElement("div");
@@ -1295,6 +1304,31 @@ function loading() {
 	content.appendChild(displayFooter());
 }
 
+function errorPage() {
+	const content = document.querySelector("#content");
+	content.innerHTML = "";
+
+	content.appendChild(displayNavBar());
+
+	const errorBox = document.createElement("div");
+	errorBox.classList.add("error-box");
+	const errorIcon = document.createElement("img");
+	errorIcon.classList.add("error-icon");
+	errorIcon.src = sad;
+	errorIcon.alt = "sad icon";
+
+	const errorText = document.createElement("h2");
+	errorText.classList.add("error-text");
+	errorText.textContent =
+		"Sorry, we couldn't find weather data for the entered location. Please check the spelling and try again with a valid city or address.";
+
+	errorBox.appendChild(errorIcon);
+	errorBox.appendChild(errorText);
+	content.appendChild(errorBox);
+
+	content.appendChild(displayFooter());
+}
+
 function getLocation() {
 	if (navigator.geolocation) {
 		navigator.geolocation.getCurrentPosition(success, error);
@@ -1351,15 +1385,6 @@ function changeUnits() {
 		? "metric"
 		: "imperial";
 	displayWeatherData(weatherData, unit);
-	if (
-		document.querySelector("input[name='forecast']:checked").value === "day"
-	) {
-		// eslint-disable-next-line no-use-before-define
-		createDayCard(weatherData, unit);
-	} else {
-		createHourlyCard(weatherData, unit);
-		buttons();
-	}
 }
 
 getLocation();

@@ -51,9 +51,21 @@ div#content {
 		sans-serif;
 }
 
+.error-icon,
 .loading-icon {
 	width: 10rem;
 	height: auto;
+}
+
+.error-box {
+	padding: 0 20rem;
+	display: flex;
+	text-align: center;
+	flex-direction: column;
+	align-items: center;
+	justify-items: center;
+	align-content: center;
+	justify-content: center;
 }
 
 .loading-box {
