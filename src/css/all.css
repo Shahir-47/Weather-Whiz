@@ -51,6 +51,19 @@ div#content {
 		sans-serif;
 }
 
+.loading-icon {
+	width: 10rem;
+	height: auto;
+}
+
+.loading-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+}
+
 .nav-bar {
 	position: sticky;
 	top: 0;
@@ -84,6 +97,7 @@ div#content {
 }
 
 .search-box input {
+	line-height: 5px;
 	border: none;
 	background-color: transparent;
 	border: hsl(0, 0%, 18.82%);
@@ -386,7 +400,7 @@ footer img {
 .main {
 	display: flex;
 	gap: 1rem;
-	justify-content: space-between;
+	justify-content: space-around;
 }
 
 .bottom {
@@ -509,7 +523,71 @@ input[type="radio"] {
 	font-size: 1.3rem;
 }
 
-.daily-forecast {
+.day-forecast {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	align-items: center;
+	justify-content: space-around;
+	padding: 1rem;
+	gap: 1rem;
+}
+
+.day-forecast * {
+	margin: 0;
+}
+
+.last-updated-link {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.last-updated-link:hover {
+	color: #ffffff;
+}
+
+.day-forecast .current-weather-day {
+	padding: 1rem;
+	display: grid;
+	gap: 1.5rem;
+	grid-template-columns: 2fr 1fr 1fr;
+	justify-content: space-around;
+	text-align: center;
+	border: 1px solid #dddddd;
+	border-radius: 15px;
+	background-color: #ffffff17;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.day-forecast .current-weather-day:hover {
+	background-color: #ffffff26;
+}
+
+.day-forecast .current-info-day {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.day-forecast .current-data-day {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.day-forecast h3 {
+	font-size: 1.5rem;
+	font-weight: 900;
+}
+
+.day-forecast h4 {
+	font-size: 1.3rem;
+	font-weight: 900;
+}
+
+.day-forecast .current-icon-day {
+	width: 4rem;
+	height: auto;
 }
 
 .hide {
@@ -643,21 +721,50 @@ input[type="radio"] {
 	border-bottom-right-radius: 0.5rem;
 	width: 100%;
 	color: #dddddd;
-	padding-top: 0.5rem;
-	padding-left: 0;
-	padding-right: 0;
+	padding: 0;
 	border-top: 1px solid #dddd;
 }
 
+.suggestions ul li span {
+	padding: 0.75rem 1.5rem;
+}
+
 .suggestions ul li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	cursor: pointer;
-	padding: 1rem 1.5rem;
 	font-weight: 900;
+	padding-right: 0.5rem;
+	transition: all 0.3s ease;
 }
 
 .suggestions ul li:hover {
 	background-color: #ffffff26;
 	color: #ffffff;
+}
+
+.suggestions ul li span:nth-of-type(1) {
+	padding-top: 1rem;
+}
+
+.suggestions ul li span:nth-last-of-type(1) {
+	padding-bottom: 1rem;
+}
+
+.copy-icon {
+	width: 1rem;
+	height: auto;
+	padding: 0.5rem;
+	border-radius: 50%;
+	cursor: pointer;
+	background-color: #313e4b;
+}
+
+.copy-icon:hover {
+	filter: brightness(1.2);
+	transform: scale(1.1);
+	border: 1px solid #dddd;
 }
 
 .search-box.active {

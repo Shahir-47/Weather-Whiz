@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { parse, format, compareAsc } from "date-fns";
 import icon from "../img/icon.svg";
@@ -20,9 +21,12 @@ import moon from "../img/moon/full-moon.svg";
 import cloud from "../img/cloud.svg";
 import sunsetIcon from "../img/sunsetIcon.svg";
 import morning from "../img/morning.svg";
+import copy from "../img/copy.svg";
+import load from "../img/load.gif";
 
 let weatherData = {};
 let lastUpdatedTime = new Date();
+let previousScrollPosition = 0;
 
 // --------------------------------- Helper Methods to display data --------------------------------- //
 
@@ -67,7 +71,7 @@ function formatTime(time24) {
 
 function formatDate(date) {
 	const formattedDate = format(date, "MMM do, yyyy 'at' h:mm a");
-	return `Last updated on ${formattedDate}.`;
+	return `Last updated on ${formattedDate}`;
 }
 
 function convertCmToInches(cm) {
@@ -370,8 +374,78 @@ function createHourlyCard(data, unit) {
 	console.log(totalCards);
 }
 
+function createDayCard(data, unit) {
+	const forecast = document.querySelector(".forecast");
+	forecast.innerHTML = "";
+
+	for (let i = 1; i < 3; i += 1) {
+		const currentWeather = document.createElement("div");
+		currentWeather.classList.add("current-weather-day");
+
+		const currentInfo = document.createElement("div");
+		currentInfo.classList.add("current-info-day");
+
+		const currentDate = document.createElement("h2");
+		currentDate.classList.add("current-date");
+		currentDate.textContent = `${format(
+			parse(data.forecast.forecastday[i].date, "yyyy-MM-dd", new Date()),
+			"EEEE, MMMM do",
+		)}`;
+		currentInfo.appendChild(currentDate);
+
+		const currentData = document.createElement("div");
+		currentData.classList.add("current-data-day");
+
+		const currentIcon = document.createElement("img");
+		currentIcon.classList.add("current-icon-day");
+		currentIcon.src = `./img/weather/${data.forecast.forecastday[
+			i
+		].day.condition.icon.slice(29)}`;
+		currentIcon.alt = `${data.forecast.forecastday[i].day.condition.text} icon`;
+		currentData.appendChild(currentIcon);
+
+		const currentDetails = document.createElement("div");
+		currentDetails.classList.add("current-details-day");
+
+		const currentTemp = document.createElement("h3");
+		currentTemp.classList.add("current-temp-day");
+		if (unit === "imperial") {
+			currentTemp.textContent = `${data.forecast.forecastday[i].day.maxtemp_f} °F`;
+		} else {
+			currentTemp.textContent = `${data.forecast.forecastday[i].day.maxtemp_c} °C`;
+		}
+		currentDetails.appendChild(currentTemp);
+
+		const currentCondition = document.createElement("h4");
+		currentCondition.classList.add("current-condition-day");
+		currentCondition.textContent = "Sunny";
+		currentDetails.appendChild(currentCondition);
+		currentData.appendChild(currentDetails);
+		currentInfo.appendChild(currentData);
+		currentWeather.appendChild(currentInfo);
+		currentWeather.appendChild(
+			createIndivInfo(
+				rain,
+				"Rain",
+				`${data.forecast.forecastday[i].day.daily_chance_of_rain}%`,
+				"rain-day",
+			),
+		);
+		currentWeather.appendChild(
+			createIndivInfo(
+				snow,
+				"Snow",
+				`${data.forecast.forecastday[i].day.daily_chance_of_snow}%`,
+				"snow-day",
+			),
+		);
+
+		forecast.appendChild(currentWeather);
+	}
+}
+
 function displayWeatherData(data, unit) {
-	const lastUpdated = document.querySelector(".last-updated");
+	const lastUpdated = document.querySelector(".last-updated-text");
 	lastUpdated.textContent = formatDate(lastUpdatedTime);
 
 	if (countWords(data.current.condition.text) >= 6) {
@@ -659,32 +733,26 @@ function buttons() {
 }
 
 async function getWeather(query) {
+	loading();
 	try {
 		const response = await fetch(
 			`http://api.weatherapi.com/v1/forecast.json?days=3&aqi=yes&q=${query}&key=fca53d6c99b24b59ab3201455232107`,
 			{ mode: "cors" },
 		);
 		weatherData = await response.json();
-		console.log(weatherData);
+		pageLoad();
 		lastUpdatedTime = new Date();
 		const unit = document.getElementById("unit-toggle").checked
 			? "metric"
 			: "imperial";
 		displayWeatherData(weatherData, unit);
-		if (
-			document.querySelector("input[name='forecast']:checked").value === "day"
-		) {
-			// eslint-disable-next-line no-use-before-define
-			showDayTab();
-		} else {
-			createHourlyCard(weatherData, unit);
-			buttons();
-		}
+		displayForecast();
 	} catch (error) {
 		console.log(error);
 	}
 }
 
+// eslint-disable-next-line consistent-return
 async function fetchCities(searchText) {
 	try {
 		const accessToken =
@@ -705,17 +773,37 @@ async function fetchCities(searchText) {
 async function displaySuggestions(predictions) {
 	const suggestionsDiv = document.querySelector(".suggestions");
 	const searchInput = document.querySelector(".search-box");
+	const searchValue = document.querySelector(".search-input");
 	// Clear the previous suggestions
 	suggestionsDiv.innerHTML = "";
 	searchInput.classList.add("active");
+
+	// If there are no predictions, remove the suggestions list and return
+	if (predictions.length === 0) {
+		searchInput.classList.remove("active");
+		return;
+	}
 
 	// Create and display the suggestion list
 	const suggestionList = document.createElement("ul");
 	predictions.forEach((prediction) => {
 		const listItem = document.createElement("li");
-		listItem.textContent = prediction;
-		listItem.addEventListener("click", () => {
+		const text = document.createElement("span");
+		text.textContent = prediction;
+		listItem.appendChild(text);
+		const copyIcon = document.createElement("img");
+		copyIcon.src = copy;
+		copyIcon.alt = "copy icon";
+		copyIcon.classList.add("copy-icon");
+		listItem.appendChild(copyIcon);
+		listItem.addEventListener("click", (e) => {
 			// When the user clicks on a suggestion, display its forecast
+			if (e.target.classList.contains("copy-icon")) {
+				searchValue.value = prediction;
+				// eslint-disable-next-line no-use-before-define
+				updateSuggestions(prediction);
+				return;
+			}
 			suggestionsDiv.innerHTML = "";
 			searchInput.classList.remove("active");
 			document.querySelector(".search-input").value = "";
@@ -726,7 +814,46 @@ async function displaySuggestions(predictions) {
 	suggestionsDiv.appendChild(suggestionList);
 }
 
+async function updateSuggestions(searchText) {
+	try {
+		// Show the autocomplete predictions based on the user's input
+		const predictions = await fetchCities(searchText);
+		await displaySuggestions(predictions);
+	} catch (error) {
+		console.error("Error fetching cities:", error);
+	}
+}
+
+async function searchAutocomplete() {
+	const searchInput = document.querySelector(".search-input");
+	const searchBox = document.querySelector(".search-box");
+	const suggestionsDiv = document.querySelector(".suggestions");
+	const searchText = searchInput.value.trim();
+	if (searchText.length > 0) {
+		try {
+			// Show the autocomplete predictions based on the user's input
+			const predictions = await fetchCities(searchText);
+			await displaySuggestions(predictions);
+		} catch (error) {
+			console.error("Error fetching cities:", error);
+		}
+	} else {
+		// Clear the suggestions if the input is empty
+		suggestionsDiv.innerHTML = "";
+		searchBox.classList.remove("active");
+	}
+}
+
 // ---------------------------------------------- Display UI ---------------------------------------- //
+
+function clearSearch() {
+	const searchBox = document.querySelector(".search-box");
+	const suggestionsDiv = document.querySelector(".suggestions");
+	const input = document.querySelector(".search-input");
+	input.value = "";
+	suggestionsDiv.innerHTML = "";
+	searchBox.classList.remove("active");
+}
 
 function displayNavBar() {
 	const navBar = document.createElement("div");
@@ -772,6 +899,39 @@ function displayNavBar() {
 	searchContainer.appendChild(suggestions);
 	navBar.appendChild(searchContainer);
 
+	// Event Listeners if search button is clicked
+	searchButton.addEventListener("click", () => {
+		const query = document.querySelector(".search-input").value;
+		clearSearch();
+		getWeather(query);
+	});
+
+	// Event Listeners if enter key is pressed on search input
+	searchInput.addEventListener("keyup", (e) => {
+		if (e.key === "Enter") {
+			const query = document.querySelector(".search-input").value;
+			clearSearch();
+			getWeather(query);
+		}
+	});
+
+	searchInput.addEventListener("input", async () => {
+		const searchText = searchInput.value.trim();
+		if (searchText.length > 0) {
+			try {
+				// Show the autocomplete predictions based on the user's input
+				const predictions = await fetchCities(searchText);
+				await displaySuggestions(predictions);
+			} catch (error) {
+				console.error("Error fetching cities:", error);
+			}
+		} else {
+			// Clear the suggestions if the input is empty
+			suggestions.innerHTML = "";
+			searchBox.classList.remove("active");
+		}
+	});
+
 	// toggle switch for imperial/metric units
 	const toggleBox = document.createElement("div");
 	toggleBox.classList.add("toggle-switch");
@@ -793,7 +953,12 @@ function displayNavBar() {
 	label.appendChild(slider);
 	toggleBox.appendChild(checkBox);
 	toggleBox.appendChild(label);
+
+	// Event Listener for toggle switch
 	navBar.appendChild(toggleBox);
+	checkBox.addEventListener("change", () => {
+		changeUnits();
+	});
 
 	return navBar;
 }
@@ -801,7 +966,27 @@ function displayNavBar() {
 function showLastUpdated() {
 	const lastUpdated = document.createElement("p");
 	lastUpdated.classList.add("last-updated");
-	lastUpdated.textContent = "Last Updated: 8/21/2021";
+	const text = document.createElement("span");
+	text.classList.add("last-updated-text");
+	text.textContent = "Last Updated: 8/21/2021";
+	lastUpdated.appendChild(text);
+	const seperator = document.createElement("span");
+	seperator.textContent = " • ";
+	lastUpdated.appendChild(seperator);
+	const click = document.createElement("span");
+	click.textContent = "Click ";
+	lastUpdated.appendChild(click);
+	const link = document.createElement("span");
+	link.classList.add("last-updated-link");
+	link.textContent = "here";
+	lastUpdated.appendChild(link);
+	const refresh = document.createElement("span");
+	refresh.textContent = " to refresh ↻";
+	lastUpdated.appendChild(refresh);
+	link.addEventListener("click", () => {
+		getWeather(weatherData.location.name);
+	});
+	lastUpdated.appendChild(refresh);
 	return lastUpdated;
 }
 
@@ -994,6 +1179,13 @@ function chooseForecast() {
 	hourlyLabel.textContent = "Hourly";
 	firstChoice.appendChild(hourly);
 	firstChoice.appendChild(hourlyLabel);
+	hourly.addEventListener("change", () => {
+		if (document.querySelector("#hourly").checked) {
+			displayForecast();
+			document.querySelector(".forecast-slider").scrollLeft =
+				previousScrollPosition;
+		}
+	});
 
 	const secondChoice = document.createElement("div");
 	secondChoice.classList.add("choice");
@@ -1008,6 +1200,13 @@ function chooseForecast() {
 	dayLabel.textContent = "Next 2 days";
 	secondChoice.appendChild(day);
 	secondChoice.appendChild(dayLabel);
+	day.addEventListener("change", () => {
+		if (document.querySelector("#day").checked) {
+			previousScrollPosition =
+				document.querySelector(".forecast-slider").scrollLeft;
+			displayForecast();
+		}
+	});
 
 	container.appendChild(firstChoice);
 	container.appendChild(secondChoice);
@@ -1017,6 +1216,9 @@ function chooseForecast() {
 
 function makeHourlyForecast() {
 	const forecast = document.querySelector(".forecast");
+	forecast.innerHTML = "";
+	forecast.classList.remove("day-forecast");
+	forecast.classList.add("hourly-forecast");
 
 	const backBtn = document.createElement("button");
 	backBtn.classList.add("back-btn");
@@ -1031,8 +1233,13 @@ function makeHourlyForecast() {
 	nextBtn.classList.add("next-btn");
 	nextBtn.textContent = ">";
 	forecast.appendChild(nextBtn);
+}
 
-	return forecast;
+function makeDayForecast() {
+	const forecast = document.querySelector(".forecast");
+	forecast.innerHTML = "";
+	forecast.classList.remove("hourly-forecast");
+	forecast.classList.add("day-forecast");
 }
 
 function makeForecast() {
@@ -1062,16 +1269,49 @@ function bottomContainer() {
 
 function pageLoad() {
 	const content = document.querySelector("#content");
+	content.innerHTML = "";
 	content.appendChild(displayNavBar());
 	content.appendChild(makePageContainer());
 	content.appendChild(displayFooter());
 	makeMainContainer();
 	bottomContainer();
-	makeHourlyForecast();
-	getWeather("Australia");
 }
 
-function displayForecast() {
+function loading() {
+	const content = document.querySelector("#content");
+	content.innerHTML = "";
+
+	content.appendChild(displayNavBar());
+
+	const loadingBox = document.createElement("div");
+	loadingBox.classList.add("loading-box");
+	const loadingIcon = document.createElement("img");
+	loadingIcon.classList.add("loading-icon");
+	loadingIcon.src = load;
+	loadingIcon.alt = "loading icon";
+	loadingBox.appendChild(loadingIcon);
+	content.appendChild(loadingBox);
+
+	content.appendChild(displayFooter());
+}
+
+function getLocation() {
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(success, error);
+	} else {
+		getWeather("auto:ip");
+	}
+}
+
+function success(position) {
+	getWeather(`${position.coords.latitude}, ${position.coords.longitude}`);
+}
+
+function error() {
+	getWeather("auto:ip");
+}
+
+function displayForecast(scroll = 0) {
 	const forecast = document.querySelector(".forecast");
 	const choice = document.querySelector('input[name="forecast"]:checked').value;
 	console.log(choice);
@@ -1079,21 +1319,31 @@ function displayForecast() {
 		forecast.innerHTML = "";
 		forecast.classList.remove("daily-forecast");
 		forecast.classList.add("hourly-forecast");
+		makeHourlyForecast();
+		showHourlyTab();
+		document.querySelector(".forecast-slider").scrollLeft = scroll;
 	} else {
 		forecast.innerHTML = "";
 		forecast.classList.remove("hourly-forecast");
-		forecast.classList.add("daily-forecast");
+		forecast.classList.add("day-forecast");
+		makeDayForecast();
+		showDayTab();
 	}
 }
 
 function showHourlyTab() {
-	createHourlyCard(weatherData);
+	const unit = document.getElementById("unit-toggle").checked
+		? "metric"
+		: "imperial";
+	createHourlyCard(weatherData, unit);
 	buttons();
 }
 
 function showDayTab() {
-	const forecastSlider = document.querySelector(".forecast-slider");
-	forecastSlider.innerHTML = "";
+	const unit = document.getElementById("unit-toggle").checked
+		? "metric"
+		: "imperial";
+	createDayCard(weatherData, unit);
 }
 
 function changeUnits() {
@@ -1105,20 +1355,22 @@ function changeUnits() {
 		document.querySelector("input[name='forecast']:checked").value === "day"
 	) {
 		// eslint-disable-next-line no-use-before-define
-		showDayTab();
+		createDayCard(weatherData, unit);
 	} else {
 		createHourlyCard(weatherData, unit);
 		buttons();
 	}
 }
 
+getLocation();
+
 export default pageLoad;
 export {
 	getWeather,
 	displayForecast,
-	showHourlyTab,
-	showDayTab,
 	changeUnits,
 	fetchCities,
 	displaySuggestions,
+	clearSearch,
+	searchAutocomplete,
 };
