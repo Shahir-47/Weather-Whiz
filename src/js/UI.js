@@ -24,12 +24,14 @@ import morning from "../img/morning.svg";
 import copy from "../img/copy.svg";
 import load from "../img/load.gif";
 import sad from "../img/sad.svg";
+import max from "../img/max.svg";
+import min from "../img/min.svg";
 
 let weatherData = {};
 let lastUpdatedTime = new Date();
 let previousScrollPosition = 0;
 
-// --------------------------------- Helper Methods to display data --------------------------------- //
+// --------------------------------- Helper Methods to format data --------------------------------- //
 
 const getAirQuality = (aqi) => {
 	if (aqi <= 50) {
@@ -188,7 +190,7 @@ function makeHourlyCard(
 	hourlyCard.addEventListener("click", () => {
 		if (id !== "Now") {
 			document.querySelector("#popup-container").style.display = "block";
-			showDetails();
+			showDetails("hour");
 			displayHourDetail(id);
 		}
 	});
@@ -454,6 +456,12 @@ function createDayCard(data, unit) {
 		);
 
 		forecast.appendChild(currentWeather);
+
+		currentWeather.addEventListener("click", () => {
+			document.querySelector("#popup-container").style.display = "block";
+			showDetails("day");
+			displayDayDetail(i);
+		});
 	}
 }
 
@@ -695,6 +703,13 @@ function displayWeatherData(data, unit) {
 	).src = `./img/moon/${moonPhase}.svg`;
 }
 
+function displayDayDetail(day) {
+	const unit = document.getElementById("unit-toggle").checked
+		? "metric"
+		: "imperial";
+	const current = weatherData.forecast.forecastday[day].day;
+}
+
 function displayHourDetail(time) {
 	const date = time.slice(0, 10);
 	const unit = document.getElementById("unit-toggle").checked
@@ -717,7 +732,6 @@ function displayHourDetail(time) {
 	});
 
 	console.log(current);
-	debugger;
 
 	if (countWords(current.condition.text) >= 6) {
 		document
@@ -1358,6 +1372,44 @@ function createIndivInfo(image, title, value, className) {
 	return weatherInfo;
 }
 
+function displayDayWeather() {
+	const moreWeather = document.createElement("div");
+	moreWeather.classList.add("more-weather");
+	moreWeather.appendChild(createIndivInfo(max, "Max Wind", "", "max-wind"));
+	moreWeather.appendChild(createIndivInfo(min, "Min Wind", "", "min-wind"));
+	moreWeather.appendChild(
+		createIndivInfo(humidity, "Humidity", "83%", "humidity"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(rain, "Chance of Rain", "0%", "rain"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(snowCloud, "Chance of Snow", "0%", "snow"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(visibility, "Visibility", "10 mi", "visibility"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(sunrise, "Sunrise", "6:00 AM", "sunrise"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(sunset, "Sunset", "6:00 PM", "sunset"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(pressure, "Pressure", "1000 mb", "pressure"),
+	);
+	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good", "air"));
+	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0", "uv"));
+	moreWeather.appendChild(
+		createIndivInfo(raindrops, "Precipitation", "0 in", "precipitation"),
+	);
+	moreWeather.appendChild(createIndivInfo(snow, "Snow", "0 in", "snow-depth"));
+	moreWeather.appendChild(
+		createIndivInfo(moon, "Moon Phase", "Waning Gibbous", "moon-phase"),
+	);
+	return moreWeather;
+}
+
 function displayMoreWeather() {
 	const moreWeather = document.createElement("div");
 	moreWeather.classList.add("more-weather");
@@ -1563,13 +1615,18 @@ function displayHourDetails() {
 	return moreWeather;
 }
 
-function showDetails() {
+function showDetails(type) {
 	const popupBody = document.querySelector(".popup-body");
 	popupBody.innerHTML = "";
 	const main = document.createElement("div");
 	main.classList.add("main");
-	main.appendChild(displayMainHour());
-	main.appendChild(displayHourDetails());
+	if (type === "hour") {
+		main.appendChild(displayMainHour());
+		main.appendChild(displayHourDetails());
+	} else {
+		main.appendChild(displayCurrentWeather());
+		main.appendChild(displayDayWeather());
+	}
 	popupBody.appendChild(main);
 }
 
