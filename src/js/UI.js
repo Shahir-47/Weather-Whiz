@@ -389,6 +389,52 @@ function createHourlyCard(data, unit) {
 	console.log(totalCards);
 }
 
+function displayMainDay() {
+	const currentWeather = document.createElement("div");
+	currentWeather.classList.add("current-weather-day");
+
+	const currentInfo = document.createElement("div");
+	currentInfo.classList.add("current-info-day");
+
+	const currentDate = document.createElement("h2");
+	currentDate.classList.add("current-date");
+	currentDate.textContent = "";
+	currentInfo.appendChild(currentDate);
+
+	const currentData = document.createElement("div");
+	currentData.classList.add("current-data-day");
+
+	const currentIcon = document.createElement("img");
+	currentIcon.classList.add("current-icon-day");
+	currentIcon.src = icon;
+	currentIcon.alt = `Weather icon`;
+	currentData.appendChild(currentIcon);
+
+	const currentDetails = document.createElement("div");
+	currentDetails.classList.add("current-details-day");
+
+	const currentCondition = document.createElement("h4");
+	currentCondition.classList.add("current-condition-day");
+	currentCondition.textContent = "";
+	currentDetails.appendChild(currentCondition);
+	currentData.appendChild(currentDetails);
+	currentInfo.appendChild(currentData);
+
+	const currentMinMax = document.createElement("h5");
+	currentMinMax.classList.add("current-min-max");
+
+	const currentMin = document.createElement("span");
+	currentMin.classList.add("current-min");
+	currentMinMax.appendChild(currentMin);
+
+	const currentMax = document.createElement("span");
+	currentMax.classList.add("current-max");
+	currentMinMax.appendChild(currentMax);
+	currentInfo.appendChild(currentMinMax);
+	currentWeather.appendChild(currentInfo);
+	return currentWeather;
+}
+
 function createDayCard(data, unit) {
 	const forecast = document.querySelector(".forecast");
 	forecast.innerHTML = "";
@@ -422,21 +468,34 @@ function createDayCard(data, unit) {
 		const currentDetails = document.createElement("div");
 		currentDetails.classList.add("current-details-day");
 
-		const currentTemp = document.createElement("h3");
-		currentTemp.classList.add("current-temp-day");
-		if (unit === "imperial") {
-			currentTemp.textContent = `${data.forecast.forecastday[i].day.maxtemp_f} °F`;
-		} else {
-			currentTemp.textContent = `${data.forecast.forecastday[i].day.maxtemp_c} °C`;
-		}
-		currentDetails.appendChild(currentTemp);
-
 		const currentCondition = document.createElement("h4");
 		currentCondition.classList.add("current-condition-day");
-		currentCondition.textContent = "Sunny";
+		currentCondition.textContent =
+			data.forecast.forecastday[i].day.condition.text;
 		currentDetails.appendChild(currentCondition);
 		currentData.appendChild(currentDetails);
 		currentInfo.appendChild(currentData);
+
+		const currentMinMax = document.createElement("h5");
+		currentMinMax.classList.add("current-min-max");
+
+		const currentMin = document.createElement("span");
+		currentMin.classList.add("current-min");
+		currentMinMax.appendChild(currentMin);
+
+		const currentMax = document.createElement("span");
+		currentMax.classList.add("current-max");
+		currentMinMax.appendChild(currentMax);
+		currentInfo.appendChild(currentMinMax);
+
+		if (unit === "imperial") {
+			currentMin.textContent = `Min: ${data.forecast.forecastday[i].day.mintemp_f} °F`;
+			currentMax.textContent = `Max: ${data.forecast.forecastday[i].day.maxtemp_f} °F`;
+		} else {
+			currentMin.textContent = `Min: ${data.forecast.forecastday[i].day.mintemp_c} °C`;
+			currentMax.textContent = `Max: ${data.forecast.forecastday[i].day.maxtemp_c} °C`;
+		}
+
 		currentWeather.appendChild(currentInfo);
 		currentWeather.appendChild(
 			createIndivInfo(
@@ -707,7 +766,198 @@ function displayDayDetail(day) {
 	const unit = document.getElementById("unit-toggle").checked
 		? "metric"
 		: "imperial";
-	const current = weatherData.forecast.forecastday[day].day;
+	const current = weatherData.forecast.forecastday[day];
+
+	if (countWords(current.day.condition.text) >= 6) {
+		document
+			.querySelector(".popup-body .current-condition")
+			.classList.add("info-length");
+	} else if (countWords(current.day.condition.text) >= 3) {
+		document
+			.querySelector(".popup-body .current-condition")
+			.classList.add("medium-text");
+	}
+
+	debugger;
+
+	if (unit === "imperial") {
+		document.querySelector(
+			".popup-body .current-min",
+		).textContent = `Min: ${current.day.mintemp_f} °F`;
+
+		document.querySelector(
+			".popup-body .current-max",
+		).textContent = `Max: ${current.day.maxtemp_f} °F`;
+
+		document.querySelector(
+			".popup-body .wind",
+		).textContent = `${current.day.maxwind_mph} mph`;
+		if (current.day.maxwind_mph > 25 && current.day.maxwind_mph < 38) {
+			document.querySelector(".popup-body .wind").style.color = `orange`;
+		} else if (current.day.maxwind_mph > 38) {
+			document.querySelector(".popup-body .wind").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".popup-body .wind").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .visibility",
+		).textContent = `${current.day.avgvis_miles} miles`;
+		if (current.day.avgvis_miles <= 2) {
+			if (current.day.avgvis_miles < 0.5) {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `#FF0000`;
+			} else {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `orange`;
+			}
+		} else {
+			document.querySelector(".popup-body .visibility").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .precipitation",
+		).textContent = `${current.day.totalprecip_in} inches`;
+		if (current.day.totalprecip_in >= 2) {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#6495ED`;
+		} else {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .snow-depth",
+		).textContent = `${convertCmToInches(current.day.totalsnow_cm)} inches`;
+		if (convertCmToInches(current.day.totalsnow_cm) >= 12) {
+			document.querySelector(".popup-body .snow-depth").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".popup-body .snow-depth").style.color = `#dddddd`;
+		}
+	} else {
+		document.querySelector(
+			".popup-body .current-min",
+		).textContent = `Min: ${current.day.mintemp_c} °C`;
+
+		document.querySelector(
+			".popup-body .current-max",
+		).textContent = `Max: ${current.day.maxtemp_c} °C`;
+
+		document.querySelector(
+			".popup-body .wind",
+		).textContent = `${current.day.maxwind_kph} kph`;
+		if (current.day.maxwind_kph > 25 && current.day.maxwind_kph < 38) {
+			document.querySelector(".popup-body .wind").style.color = `orange`;
+		} else if (current.day.maxwind_kph > 38) {
+			document.querySelector(".popup-body .wind").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".popup-body .wind").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .visibility",
+		).textContent = `${current.day.avgvis_km} km`;
+		if (current.day.avgvis_km <= 2) {
+			if (current.day.avgvis_km < 0.5) {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `#FF0000`;
+			} else {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `orange`;
+			}
+		} else {
+			document.querySelector(".popup-body .visibility").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .precipitation",
+		).textContent = `${current.day.totalprecip_mm} mm`;
+		if (current.day.totalprecip_mm >= 2) {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#6495ED`;
+		} else {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .snow-depth",
+		).textContent = `${current.day.totalsnow_cm} cm`;
+		if (current.day.totalsnow_cm >= 12) {
+			document.querySelector(".popup-body .snow-depth").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".popup-body .snow-depth").style.color = `#dddddd`;
+		}
+	}
+
+	let moonPhase = current.astro.moon_phase;
+	moonPhase = moonPhase.replace(" ", "-");
+	moonPhase = moonPhase.toLowerCase();
+
+	document.querySelector(".popup-body .current-date").textContent = `${format(
+		parse(current.date, "yyyy-MM-dd", new Date()),
+		"EEEE, MMMM do",
+	)}`;
+
+	document.querySelector(
+		".popup-body .current-icon-day",
+	).src = `./img/weather/${current.day.condition.icon.slice(29)}`;
+
+	document.querySelector(".popup-body .current-details-day").textContent =
+		current.day.condition.text;
+
+	document.querySelector(
+		".popup-body .humidity",
+	).textContent = `${current.day.avghumidity}%`;
+
+	document.querySelector(
+		".popup-body .rain",
+	).textContent = `${current.day.daily_chance_of_rain}%`;
+	if (current.day.daily_chance_of_rain > 70) {
+		document.querySelector(".rain").style.color = `#6495ED`;
+	}
+
+	document.querySelector(
+		".popup-body .snow",
+	).textContent = `${current.day.daily_chance_of_snow}%`;
+	if (current.day.daily_chance_of_snow > 70) {
+		document.querySelector(".snow").style.color = `#6495ED`;
+	}
+
+	document.querySelector(".popup-body .air").textContent = `${getAirQuality(
+		current.day.air_quality.pm2_5,
+	)}`;
+
+	document.querySelector(
+		".popup-body .sunrise",
+	).textContent = `${current.astro.sunrise}`;
+
+	document.querySelector(
+		".popup-body .sunset",
+	).textContent = `${current.astro.sunset}`;
+
+	document.querySelector(".popup-body .uv").textContent = `${current.day.uv}`;
+	if (current.day.uv >= 11) {
+		document.querySelector(".popup-body .uv").style.color = `#FF0000`;
+	} else if (current.day.uv >= 8) {
+		document.querySelector(".popup-body .uv").style.color = `orange`;
+	}
+
+	document.querySelector(
+		".popup-body .moon-phase",
+	).textContent = `${current.astro.moon_phase}`;
+
+	document.querySelector(
+		".popup-body img[alt='Moon Phase icon']",
+	).src = `./img/moon/${moonPhase}.svg`;
 }
 
 function displayHourDetail(time) {
@@ -739,7 +989,7 @@ function displayHourDetail(time) {
 			.classList.add("info-length");
 	} else if (countWords(current.condition.text) >= 3) {
 		document
-			.querySelector("popup-body .current-condition")
+			.querySelector(".popup-body .current-condition")
 			.classList.add("medium-text");
 	}
 
@@ -1375,8 +1625,8 @@ function createIndivInfo(image, title, value, className) {
 function displayDayWeather() {
 	const moreWeather = document.createElement("div");
 	moreWeather.classList.add("more-weather");
-	moreWeather.appendChild(createIndivInfo(max, "Max Wind", "", "max-wind"));
-	moreWeather.appendChild(createIndivInfo(min, "Min Wind", "", "min-wind"));
+	moreWeather.classList.add("day");
+	moreWeather.appendChild(createIndivInfo(wind, "Wind", "", "wind"));
 	moreWeather.appendChild(
 		createIndivInfo(humidity, "Humidity", "83%", "humidity"),
 	);
@@ -1394,9 +1644,6 @@ function displayDayWeather() {
 	);
 	moreWeather.appendChild(
 		createIndivInfo(sunset, "Sunset", "6:00 PM", "sunset"),
-	);
-	moreWeather.appendChild(
-		createIndivInfo(pressure, "Pressure", "1000 mb", "pressure"),
 	);
 	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good", "air"));
 	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0", "uv"));
@@ -1566,7 +1813,7 @@ function displayMainHour() {
 	const currentIcon = document.createElement("img");
 	currentIcon.classList.add("current-icon");
 	currentIcon.src = icon;
-	currentIcon.alt = "Current weather icon";
+	currentIcon.alt = "Weather icon";
 	currentData.appendChild(currentIcon);
 
 	const currentDetails = document.createElement("div");
@@ -1590,6 +1837,7 @@ function displayMainHour() {
 function displayHourDetails() {
 	const moreWeather = document.createElement("div");
 	moreWeather.classList.add("more-weather");
+	moreWeather.classList.remove("day");
 	moreWeather.appendChild(createIndivInfo(temp, "Feels Like", "83 °F", "temp"));
 	moreWeather.appendChild(
 		createIndivInfo(humidity, "Humidity", "83%", "humidity"),
@@ -1619,12 +1867,13 @@ function showDetails(type) {
 	const popupBody = document.querySelector(".popup-body");
 	popupBody.innerHTML = "";
 	const main = document.createElement("div");
-	main.classList.add("main");
 	if (type === "hour") {
+		main.classList.add("main");
 		main.appendChild(displayMainHour());
 		main.appendChild(displayHourDetails());
 	} else {
-		main.appendChild(displayCurrentWeather());
+		main.classList.add("main-day");
+		main.appendChild(displayMainDay());
 		main.appendChild(displayDayWeather());
 	}
 	popupBody.appendChild(main);

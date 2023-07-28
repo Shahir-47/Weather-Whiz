@@ -108,6 +108,7 @@ div#content {
 	justify-content: center;
 }
 
+.main-day,
 #popup .main {
 	background-color: #3f2354;
 	border-bottom-left-radius: 15px;
@@ -387,9 +388,22 @@ footer img {
 	gap: 0.5rem;
 }
 
+.popup-body .current-min-max {
+	font-size: 1.3rem;
+	margin: 0;
+}
+
+.popup-body .current-data-day,
 .current-data {
 	display: flex;
 	gap: 0.5rem;
+}
+
+.popup-body .current-details-day {
+	display: flex;
+	align-items: center;
+	font-size: 1.7rem;
+	font-weight: bold;
 }
 
 .current-icon {
@@ -445,6 +459,41 @@ footer img {
 	align-items: center;
 }
 
+#popup .more-weather.day {
+	display: grid;
+	grid-template-columns: repeat(4, max-content);
+	/* justify-content: space-between; */
+	gap: 2.5rem;
+	grid-row-gap: 0.25rem;
+	grid-template-rows: repeat(3, 1fr);
+	align-items: center;
+}
+
+#popup .main-day .more-weather.day {
+	display: grid;
+	grid-template-columns: repeat(4, max-content);
+	/* justify-content: space-between; */
+	gap: 2.5rem;
+	grid-row-gap: 1rem;
+	grid-template-rows: repeat(3, 1fr);
+	align-items: center;
+}
+
+.day-forecast .current-min-max {
+	font-size: 1.2rem;
+}
+
+.more-weather {
+	display: grid;
+	grid-template-columns: repeat(5, max-content);
+	/* justify-content: space-between; */
+	gap: 2.5rem;
+	grid-row-gap: 0.25rem;
+	grid-template-rows: repeat(3, 1fr);
+	align-items: center;
+	/* padding: 0 1rem; */
+}
+
 .more-weather-info {
 	display: flex;
 	align-items: center;
@@ -469,6 +518,17 @@ footer img {
 .more-weather-value {
 	margin: 0;
 	font-size: 1.5rem;
+}
+
+.main-day * {
+	margin: 0;
+}
+
+.main-day {
+	display: flex;
+	gap: 3rem;
+	align-items: center;
+	justify-content: space-around;
 }
 
 .main {
