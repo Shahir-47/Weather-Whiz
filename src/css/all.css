@@ -57,6 +57,46 @@ div#content {
 	height: auto;
 }
 
+#popup-container {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 999;
+}
+
+#popup {
+	-webkit-box-shadow: 8px 6px 14px 0px rgba(0, 0, 0, 0.69);
+	box-shadow: 8px 6px 14px 0px rgba(0, 0, 0, 0.69);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: var(--sidebar-bg-color);
+	width: max-content;
+	height: max-content;
+	border-radius: 15px;
+}
+
+.forecast-slider .hourly-card:nth-of-type(1):hover {
+	cursor: default;
+	background-color: #ffffff17;
+}
+
+.popup-header {
+	display: grid;
+	grid-template-columns: 1fr min-content;
+	align-items: center;
+	justify-items: center;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+	background-color: #9972b0;
+	color: #dddddd;
+}
+
 .error-box {
 	padding: 0 20rem;
 	display: flex;
@@ -66,6 +106,29 @@ div#content {
 	justify-items: center;
 	align-content: center;
 	justify-content: center;
+}
+
+#popup .main {
+	background-color: #3f2354;
+	border-bottom-left-radius: 15px;
+	border-bottom-right-radius: 15px;
+	padding: 1rem;
+}
+
+.close-btn:hover,
+.close-btn:active {
+	color: #f44336;
+}
+.close-btn {
+	background-color: transparent;
+	width: 4rem;
+	height: 3rem;
+	color: #dddddd;
+	font-weight: 900;
+	border: none;
+	font-size: 2rem;
+	cursor: pointer;
+	transition: all 0.2s ease-in-out;
 }
 
 .loading-box {
@@ -370,6 +433,16 @@ footer img {
 
 .current-info h5 {
 	font-size: 1.2rem;
+}
+
+#popup .more-weather {
+	display: grid;
+	grid-template-columns: repeat(5, max-content);
+	/* justify-content: space-between; */
+	gap: 2.5rem;
+	grid-row-gap: 0.25rem;
+	grid-template-rows: repeat(2, 1fr);
+	align-items: center;
 }
 
 .more-weather {

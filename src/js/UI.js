@@ -121,6 +121,7 @@ function makeHourlyCard(
 	condition,
 	rainChance,
 	snowChance,
+	id,
 ) {
 	const hourlyCard = document.createElement("div");
 	hourlyCard.classList.add("hourly-card");
@@ -184,6 +185,14 @@ function makeHourlyCard(
 
 	hourlyCard.appendChild(moreInfo);
 
+	hourlyCard.addEventListener("click", () => {
+		if (id !== "Now") {
+			document.querySelector("#popup-container").style.display = "block";
+			showDetails();
+			displayHourDetail(id);
+		}
+	});
+
 	return hourlyCard;
 }
 
@@ -217,6 +226,7 @@ function createHourlyCard(data, unit) {
 			data.current.condition.text,
 			`${data.forecast.forecastday[0].day.daily_chance_of_rain}%`,
 			`${data.forecast.forecastday[0].day.daily_chance_of_snow}%`,
+			"Now",
 		),
 	);
 	totalCards += 1;
@@ -268,6 +278,7 @@ function createHourlyCard(data, unit) {
 				condition,
 				rainChance,
 				snowChance,
+				data.forecast.forecastday[0].hour[i].time,
 			),
 		);
 		totalCards += 1;
@@ -344,6 +355,7 @@ function createHourlyCard(data, unit) {
 				condition,
 				rainChance,
 				snowChance,
+				data.forecast.forecastday[1].hour[i].time,
 			),
 		);
 		if (
@@ -683,6 +695,222 @@ function displayWeatherData(data, unit) {
 	).src = `./img/moon/${moonPhase}.svg`;
 }
 
+function displayHourDetail(time) {
+	const date = time.slice(0, 10);
+	const unit = document.getElementById("unit-toggle").checked
+		? "metric"
+		: "imperial";
+	let current;
+
+	weatherData.forecast.forecastday.every((day, i) => {
+		if (date === day.date) {
+			weatherData.forecast.forecastday[i].hour.every((hour) => {
+				if (time === hour.time) {
+					current = hour;
+					return false;
+				}
+				return true;
+			});
+			return false;
+		}
+		return true;
+	});
+
+	console.log(current);
+	debugger;
+
+	if (countWords(current.condition.text) >= 6) {
+		document
+			.querySelector(".popup-body .current-condition")
+			.classList.add("info-length");
+	} else if (countWords(current.condition.text) >= 3) {
+		document
+			.querySelector("popup-body .current-condition")
+			.classList.add("medium-text");
+	}
+
+	if (unit === "imperial") {
+		document.querySelector(
+			".popup-body .current-temp",
+		).textContent = `${current.temp_f} °F`;
+
+		document.querySelector(
+			".popup-body .temp",
+		).textContent = `${current.feelslike_f} °F`;
+		if (current.feelslike_f > 80) {
+			document.querySelector(".popup-body .temp").style.color = `#FF0000`;
+		} else if (current.feelslike_f < 50) {
+			document.querySelector(".popup-body .temp").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".popup-body .temp").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .wind",
+		).textContent = `${current.wind_mph} mph`;
+		if (current.wind_mph > 25 && current.wind_mph < 38) {
+			document.querySelector(".popup-body .wind").style.color = `orange`;
+		} else if (current.wind_mph > 38) {
+			document.querySelector(".popup-body .wind").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".popup-body .wind").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .pressure",
+		).textContent = `${current.pressure_in} inHg`;
+		if (current.pressure_in <= 30.15) {
+			if (current.pressure_in < 29.6) {
+				document.querySelector(".popup-body .pressure").style.color = `#FF0000`;
+			} else {
+				document.querySelector(".popup-body .pressure").style.color = `orange`;
+			}
+		} else {
+			document.querySelector(".popup-body .pressure").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .visibility",
+		).textContent = `${current.vis_miles} miles`;
+		if (current.vis_miles <= 2) {
+			if (current.vis_miles < 0.5) {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `#FF0000`;
+			} else {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `orange`;
+			}
+		} else {
+			document.querySelector(".popup-body .visibility").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .precipitation",
+		).textContent = `${current.precip_in} inches`;
+		if (current.precip_in >= 2) {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#6495ED`;
+		} else {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#dddddd`;
+		}
+	} else {
+		document.querySelector(
+			".popup-body .current-temp",
+		).textContent = `${current.temp_c} °C`;
+
+		document.querySelector(
+			".popup-body .temp",
+		).textContent = `${current.feelslike_c} °C`;
+		if (current.feelslike_c > 26.6) {
+			document.querySelector(".popup-body .temp").style.color = `#FF0000`;
+		} else if (current.feelslike_c < 10) {
+			document.querySelector(".popup-body .temp").style.color = `#6495ED`;
+		} else {
+			document.querySelector(".popup-body .temp").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .wind",
+		).textContent = `${current.wind_kph} km/h`;
+		if (current.wind_kph > 40.2336 && current.wind_kph < 61.152) {
+			document.querySelector(".popup-body .wind").style.color = `orange`;
+		} else if (current.wind_kph > 61.152) {
+			document.querySelector(".popup-body .wind").style.color = `#FF0000`;
+		} else {
+			document.querySelector(".popup-body .wind").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .pressure",
+		).textContent = `${current.pressure_mb} mb`;
+		if (current.pressure_mb <= 1020.6) {
+			if (current.pressure_mb < 1005.84) {
+				document.querySelector(".popup-body .pressure").style.color = `#FF0000`;
+			} else {
+				document.querySelector(".popup-body .pressure").style.color = `orange`;
+			}
+		} else {
+			document.querySelector(".popup-body .pressure").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .visibility",
+		).textContent = `${current.vis_km} km`;
+		if (current.vis_km <= 3.21869) {
+			if (current.vis_km < 0.804672) {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `#FF0000`;
+			} else {
+				document.querySelector(
+					".popup-body .visibility",
+				).style.color = `orange`;
+			}
+		} else {
+			document.querySelector(".popup-body .visibility").style.color = `#dddddd`;
+		}
+
+		document.querySelector(
+			".popup-body .precipitation",
+		).textContent = `${current.precip_mm} mm`;
+		if (current.precip_mm >= 50.8) {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#6495ED`;
+		} else {
+			document.querySelector(
+				".popup-body .precipitation",
+			).style.color = `#dddddd`;
+		}
+	}
+
+	document.querySelector(".popup-body .current-location").textContent = format(
+		new Date(current.time),
+		"MMMM do, yyyy 'at' h a",
+	);
+
+	document.querySelector(
+		".popup-body .current-icon",
+	).src = `./img/weather/${current.condition.icon.slice(29)}`;
+
+	document.querySelector(".popup-body .current-condition").textContent =
+		current.condition.text;
+
+	document.querySelector(
+		".popup-body .humidity",
+	).textContent = `${current.humidity}%`;
+
+	document.querySelector(
+		".popup-body .rain",
+	).textContent = `${current.chance_of_rain}%`;
+	if (current.chance_of_rain > 70) {
+		document.querySelector(".popup-body .rain").style.color = `#6495ED`;
+	}
+
+	document.querySelector(
+		".popup-body .snow",
+	).textContent = `${current.chance_of_snow}%`;
+	if (current.chance_of_snow > 70) {
+		document.querySelector(".popup-body .snow").style.color = `#6495ED`;
+	}
+
+	document.querySelector(".popup-body .air").textContent = `${getAirQuality(
+		current.air_quality.pm2_5,
+	)}`;
+
+	document.querySelector(".popup-body .uv").textContent = `${current.uv}`;
+	if (current.uv >= 11) {
+		document.querySelector(".popup-body .uv").style.color = `#FF0000`;
+	} else if (current.uv >= 8) {
+		document.querySelector(".popup-body .uv").style.color = `orange`;
+	}
+}
+
 function buttons() {
 	const cardsWrapper = document.querySelector(".forecast-slider");
 	const backBtn = document.querySelector(".back-btn");
@@ -744,6 +972,7 @@ async function getWeather(query) {
 			{ mode: "cors" },
 		);
 		weatherData = await response.json();
+		console.log(weatherData);
 		pageLoad();
 		lastUpdatedTime = new Date();
 		const unit = document.getElementById("unit-toggle").checked
@@ -1267,6 +1496,83 @@ function makeMainContainer() {
 	pageContainer.appendChild(main);
 }
 
+function displayMainHour() {
+	const currentWeather = document.createElement("div");
+	currentWeather.classList.add("current-weather");
+
+	const currentInfo = document.createElement("div");
+	currentInfo.classList.add("current-info");
+
+	const currentLocation = document.createElement("h2");
+	currentLocation.classList.add("current-location");
+	currentLocation.textContent = "Current Location";
+	currentInfo.appendChild(currentLocation);
+
+	const currentData = document.createElement("div");
+	currentData.classList.add("current-data");
+
+	const currentIcon = document.createElement("img");
+	currentIcon.classList.add("current-icon");
+	currentIcon.src = icon;
+	currentIcon.alt = "Current weather icon";
+	currentData.appendChild(currentIcon);
+
+	const currentDetails = document.createElement("div");
+	currentDetails.classList.add("current-details");
+
+	const currentTemp = document.createElement("h3");
+	currentTemp.classList.add("current-temp");
+	currentTemp.textContent = "83 °F";
+	currentDetails.appendChild(currentTemp);
+
+	const currentCondition = document.createElement("h4");
+	currentCondition.classList.add("current-condition");
+	currentCondition.textContent = "Sunny";
+	currentDetails.appendChild(currentCondition);
+	currentData.appendChild(currentDetails);
+	currentInfo.appendChild(currentData);
+	currentWeather.appendChild(currentInfo);
+	return currentWeather;
+}
+
+function displayHourDetails() {
+	const moreWeather = document.createElement("div");
+	moreWeather.classList.add("more-weather");
+	moreWeather.appendChild(createIndivInfo(temp, "Feels Like", "83 °F", "temp"));
+	moreWeather.appendChild(
+		createIndivInfo(humidity, "Humidity", "83%", "humidity"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(rain, "Chance of Rain", "0%", "rain"),
+	);
+	moreWeather.appendChild(createIndivInfo(wind, "Wind", "5 mph", "wind"));
+	moreWeather.appendChild(
+		createIndivInfo(snowCloud, "Chance of Snow", "0%", "snow"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(visibility, "Visibility", "10 mi", "visibility"),
+	);
+	moreWeather.appendChild(
+		createIndivInfo(pressure, "Pressure", "1000 mb", "pressure"),
+	);
+	moreWeather.appendChild(createIndivInfo(air, "Air Quality", "Good", "air"));
+	moreWeather.appendChild(createIndivInfo(uv, "UV Index", "0", "uv"));
+	moreWeather.appendChild(
+		createIndivInfo(raindrops, "Precipitation", "0 in", "precipitation"),
+	);
+	return moreWeather;
+}
+
+function showDetails() {
+	const popupBody = document.querySelector(".popup-body");
+	popupBody.innerHTML = "";
+	const main = document.createElement("div");
+	main.classList.add("main");
+	main.appendChild(displayMainHour());
+	main.appendChild(displayHourDetails());
+	popupBody.appendChild(main);
+}
+
 function bottomContainer() {
 	const pageContainer = document.querySelector(".page-container");
 	const bottom = document.createElement("div");
@@ -1284,6 +1590,7 @@ function pageLoad() {
 	content.appendChild(displayFooter());
 	makeMainContainer();
 	bottomContainer();
+	popUp();
 }
 
 function loading() {
@@ -1384,7 +1691,50 @@ function changeUnits() {
 	const unit = document.getElementById("unit-toggle").checked
 		? "metric"
 		: "imperial";
+
+	if (document.querySelector("#hourly").checked) {
+		previousScrollPosition =
+			document.querySelector(".forecast-slider").scrollLeft;
+	}
+
 	displayWeatherData(weatherData, unit);
+	displayForecast();
+
+	if (document.querySelector("#hourly").checked) {
+		document.querySelector(".forecast-slider").scrollLeft =
+			previousScrollPosition;
+	}
+}
+
+function popUp() {
+	const popupContainer = document.createElement("div");
+	popupContainer.setAttribute("id", "popup-container");
+	const popup = document.createElement("div");
+	popup.setAttribute("id", "popup");
+
+	const popupHeader = document.createElement("div");
+	popupHeader.classList.add("popup-header");
+	const popupTitle = document.createElement("h2");
+	// formTitle.textContent = "Details";
+	popupHeader.appendChild(popupTitle);
+
+	const closeBtn = document.createElement("button");
+	closeBtn.classList.add("close-btn");
+	closeBtn.id = "closeDetailsBtn";
+	closeBtn.textContent = "X";
+	popupHeader.appendChild(closeBtn);
+	popup.appendChild(popupHeader);
+
+	closeBtn.addEventListener("click", () => {
+		document.querySelector("#popup-container").style.display = "none";
+	});
+
+	const popupBody = document.createElement("div");
+	popupBody.classList.add("popup-body");
+	popup.appendChild(popupBody);
+
+	popupContainer.appendChild(popup);
+	document.querySelector("#content").appendChild(popupContainer);
 }
 
 getLocation();
