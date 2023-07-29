@@ -124,8 +124,6 @@ Weather-Whiz/
 │   │   │
 │   │   └── [icons]
 │   │
-│   ├── README.md
-│   │
 │   └── script.js
 │
 ├── .babelrc
@@ -138,7 +136,6 @@ Weather-Whiz/
 ├── LICENSE
 ├── package-lock.json
 ├── package.json
-├── README.md
 └── webpack.config.js
 ```
 
