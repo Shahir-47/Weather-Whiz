@@ -28,6 +28,7 @@ import sad from "./img/sad.svg";
 let weatherData = {}; // Stores the weather data from the API
 let lastUpdatedTime = new Date(); // Stores the last time the weather data was updated
 let previousScrollPosition = 0; // Stores the previous scroll position of the hour tab
+let unitSetting = "imperial"; // Stores the unit of measurement for the weather data
 
 // --------------------------------- Helper Methods to format data --------------------------------- //
 
@@ -1624,6 +1625,9 @@ function displayNavBar() {
 	const checkBox = document.createElement("input");
 	checkBox.type = "checkbox";
 	checkBox.setAttribute("id", "unit-toggle");
+	if (unitSetting === "metric") {
+		checkBox.checked = true;
+	}
 	const label = document.createElement("label");
 	label.setAttribute("for", "unit-toggle");
 	const metric = document.createElement("span");
@@ -2353,6 +2357,11 @@ function pageLoad() {
 
 // loading page
 function loading() {
+	if (document.getElementById("unit-toggle")) {
+		unitSetting = document.getElementById("unit-toggle").checked
+			? "metric"
+			: "imperial";
+	}
 	const content = document.querySelector("#content");
 	content.innerHTML = ""; // clear the content
 
@@ -2373,6 +2382,9 @@ function loading() {
 
 // error page
 function errorPage() {
+	unitSetting = document.getElementById("unit-toggle").checked
+		? "metric"
+		: "imperial";
 	const content = document.querySelector("#content");
 	content.innerHTML = ""; // clear the content
 
