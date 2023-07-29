@@ -53,7 +53,7 @@ Weather Whiz uses the following technologies:
 
 - **Prettier**: The application uses Prettier to format the JavaScript code.
 
-- **OpenWeather API**: The application uses the OpenWeather API to get weather data for different locations.
+- **Weather API**: The application uses the Weather API to get weather data for different locations.
 
 - **Mapbox API**: The application uses the Mapbox API to display autocomplete suggestions.
 
@@ -181,7 +181,7 @@ Weather-Whiz/
 
 - **Mapbox API**: The Mapbox API is used to display autocomplete suggestions for the search bar. The API is available at [https://www.mapbox.com/](https://www.mapbox.com/)
 
-- **OpenWeather API**: The Weather API is used to get weather data for different locations. The API is available at [https://www.weatherapi.com/](https://www.weatherapi.com/)
+- **Weather API**: The Weather API is used to get weather data for different locations. The API is available at [https://www.weatherapi.com/](https://www.weatherapi.com/)
 
 ## License
 
