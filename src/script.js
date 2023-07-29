@@ -1368,6 +1368,8 @@ async function displaySuggestions(predictions) {
 	const suggestionsDiv = document.querySelector(".suggestions");
 	const searchInput = document.querySelector(".search-box");
 	const searchValue = document.querySelector(".search-input");
+	let selectedPrediction = -1; // the index of the selected prediction
+
 	// Clear the previous suggestions
 	suggestionsDiv.innerHTML = "";
 	searchInput.classList.add("active");
@@ -1378,11 +1380,30 @@ async function displaySuggestions(predictions) {
 		return;
 	}
 
+	// Function to handle selection of suggestion and calling getWeather
+	function selectSuggestion(index) {
+		const selectedSuggestion = suggestionList.querySelectorAll("li")[index];
+		if (selectedSuggestion) {
+			selectedPrediction = -1; // reset the selected prediction
+			const selectedLocation =
+				selectedSuggestion.querySelector("span").textContent;
+			suggestionsDiv.innerHTML = ""; // clear the suggestions
+			searchInput.classList.remove("active"); // remove the active class from the search input
+			document.querySelector(".search-input").value = ""; // clear the search input
+			getWeather(selectedLocation); // get the weather for the selected location
+		}
+	}
+
+	// Function to handle pressing the enter key on a selected suggestion
+	function enter(e, index) {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			selectSuggestion(index);
+		}
+	}
+
 	// Create and display the suggestion list
 	const suggestionList = document.createElement("ul");
-
-	let selectedPrediction = -1; // the index of the selected prediction
-
 	// Function to update the selected suggestion
 	function updateSelected(index) {
 		// Remove the "selected" class from all suggestions
@@ -1391,23 +1412,16 @@ async function displaySuggestions(predictions) {
 			if (i === index) {
 				suggestion.classList.add("selected");
 				searchValue.value = suggestion.querySelector("span").textContent;
+				suggestion.addEventListener("keydown", (e) => {
+					enter(e, i);
+				});
 			} else {
+				suggestion.removeEventListener("keydown", (e) => {
+					enter(e, i);
+				});
 				suggestion.classList.remove("selected");
 			}
 		});
-	}
-
-	// Function to handle selection of suggestion and calling getWeather
-	function selectSuggestion(index) {
-		const selectedSuggestion = suggestionList.querySelectorAll("li")[index];
-		if (selectedSuggestion) {
-			const selectedLocation =
-				selectedSuggestion.querySelector("span").textContent;
-			suggestionsDiv.innerHTML = ""; // clear the suggestions
-			searchInput.classList.remove("active"); // remove the active class from the search input
-			document.querySelector(".search-input").value = ""; // clear the search input
-			getWeather(selectedLocation); // get the weather for the selected location
-		}
 	}
 
 	// Create the list of suggestions
@@ -1425,10 +1439,12 @@ async function displaySuggestions(predictions) {
 			// If the copy icon is clicked, then copy the suggestion to the search input
 			if (e.target.classList.contains("copy-icon")) {
 				searchValue.value = prediction;
+				selectedPrediction = -1; // reset the selected prediction
 				updateSuggestions(prediction); // update the suggestions based on the new input
 				return;
 			}
 			// Otherwise, if the suggested location is clicked, then get the weather for that location
+			selectedPrediction = -1; // reset the selected prediction
 			suggestionsDiv.innerHTML = ""; // clear the suggestions
 			searchInput.classList.remove("active"); // remove the active class from the search input
 			document.querySelector(".search-input").value = ""; // clear the search input
@@ -1443,6 +1459,7 @@ async function displaySuggestions(predictions) {
 			e.preventDefault();
 			selectedPrediction = Math.max(selectedPrediction - 1, 0);
 			updateSelected(selectedPrediction);
+			e.stopPropagation();
 		} else if (e.key === "ArrowDown") {
 			e.preventDefault();
 			selectedPrediction = Math.min(
@@ -1450,10 +1467,10 @@ async function displaySuggestions(predictions) {
 				predictions.length - 1,
 			);
 			updateSelected(selectedPrediction);
+			e.stopPropagation();
 		} else if (e.key === "Escape") {
+			e.preventDefault();
 			clearSearch();
-		} else if (e.key === "Enter") {
-			selectSuggestion(selectedPrediction);
 		}
 	});
 
@@ -1548,6 +1565,39 @@ function displayNavBar() {
 			clearSearch(); // clear the search input and suggestions
 			getWeather(query); // get the weather for the location
 		}
+	});
+
+	document.addEventListener("keydown", (e) => {
+		// if the "/" key is pressed, then focus on the search input
+		if (!e.target.closest(".search-input:focus") && e.key === "/") {
+			e.preventDefault();
+			document.querySelector(".search-input").focus();
+
+			// if the user presses key out of focus, then display the dialogue box
+		} else if (!e.target.closest(".search-input:focus")) {
+			document.getElementById("dialogue-box").classList.remove("hidden");
+
+			// for animation purposes
+			setTimeout(() => {
+				document.getElementById("dialogue-box").classList.add("visible");
+			}, 10);
+
+			// hide the dialogue box after 3 seconds
+			setTimeout(() => {
+				document.getElementById("dialogue-box").classList.remove("visible");
+				document.getElementById("dialogue-box").classList.add("invisible");
+			}, 3000);
+
+			// if the user clicks on the search input, then hide the dialogue box
+		} else if (e.target.closest(".search-input:focus")) {
+			document.getElementById("dialogue-box").classList.remove("visible");
+			document.getElementById("dialogue-box").classList.add("invisible");
+		}
+	});
+
+	searchInput.addEventListener("focus", () => {
+		document.getElementById("dialogue-box").classList.remove("visible");
+		document.getElementById("dialogue-box").classList.add("invisible");
 	});
 
 	// when the user types in the search input, then display the autocomplete suggestions
@@ -2262,6 +2312,30 @@ function popUp() {
 	document.querySelector("#content").appendChild(popupContainer);
 }
 
+function dialogueBox() {
+	const box = document.createElement("div");
+	box.id = "dialogue-box";
+	box.classList.add("hidden");
+	const text = document.createElement("p");
+	text.classList.add("dialogue-text");
+
+	const textOne = document.createElement("span");
+	textOne.textContent = "Press  ";
+	text.appendChild(textOne);
+
+	const textTwo = document.createElement("span");
+	textTwo.classList.add("dialogue-text-bold");
+	textTwo.textContent = "/";
+	text.appendChild(textTwo);
+
+	const textThree = document.createElement("span");
+	textThree.textContent = "  to jump to the search box";
+	text.appendChild(textThree);
+
+	box.appendChild(text);
+	document.querySelector("#content").appendChild(box);
+}
+
 // -------------------------------------- Main Page, Error Page, and Loading page  ---------------------- //
 
 // loads the page
@@ -2274,6 +2348,7 @@ function pageLoad() {
 	makeMainContainer(); // display the top half of the page
 	bottomContainer(); // display the bottom half of the page
 	popUp(); // add the popup
+	dialogueBox(); // add the dialogue box
 }
 
 // loading page

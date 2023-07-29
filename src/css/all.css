@@ -872,6 +872,43 @@ input[type="radio"] {
 	padding-right: 0.5rem;
 }
 
+#dialogue-box {
+	position: fixed;
+	bottom: -80px; /* Initially hidden below the screen */
+	left: 20px;
+	padding: 10px;
+	background-color: #192734;
+	color: #dddddd;
+	border-radius: 15px;
+	font-size: 14px;
+	font-weight: 900;
+	box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+	transition: bottom 0.3s ease; /* Animation effect */
+}
+
+#dialogue-box span {
+	padding: 0 0.25rem;
+}
+
+.dialogue-text-bold {
+	font-weight: 900;
+	padding: 0 0.25rem;
+	border: 1px solid #dddddd;
+	border-radius: 2px;
+}
+
+#dialogue-box .invisible {
+	bottom: -80px;
+}
+
+#dialogue-box.visible {
+	bottom: 20px; /* Show the popup by moving it up */
+}
+
+.hidden {
+	display: none;
+}
+
 .selected,
 .suggestions ul li:hover {
 	background-color: #ffffff26;
