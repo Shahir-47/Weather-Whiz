@@ -1,6 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-use-before-define */
-// eslint-disable-next-line import/no-extraneous-dependencies
 import "./css/all.css";
 import "./css/normalize.css";
 import { parse, format, compareAsc } from "date-fns";
@@ -65,7 +62,6 @@ const getAirQuality = (aqi) => {
 function formatTime(time24) {
 	const [hours, minutes] = time24.split(":");
 	let suffix = "AM";
-	// eslint-disable-next-line radix
 	let hours12 = parseInt(hours);
 
 	if (hours12 >= 12) {
@@ -1343,14 +1339,12 @@ async function getWeather(query) {
 			: "imperial";
 		displayWeatherData(weatherData, unit); // display the current weather
 		displayForecast(); // display the hourly/2-day forecast
-		// eslint-disable-next-line no-shadow
 	} catch (error) {
 		// if there is an error, then display the error page
 		errorPage();
 	}
 }
 
-// eslint-disable-next-line consistent-return
 // get the list of cities from the API based on the user's search
 async function fetchCities(searchText) {
 	try {
@@ -1386,6 +1380,37 @@ async function displaySuggestions(predictions) {
 
 	// Create and display the suggestion list
 	const suggestionList = document.createElement("ul");
+
+	let selectedPrediction = -1; // the index of the selected prediction
+
+	// Function to update the selected suggestion
+	function updateSelected(index) {
+		// Remove the "selected" class from all suggestions
+		const allSuggestions = suggestionList.querySelectorAll("li");
+		allSuggestions.forEach((suggestion, i) => {
+			if (i === index) {
+				suggestion.classList.add("selected");
+				searchValue.value = suggestion.querySelector("span").textContent;
+			} else {
+				suggestion.classList.remove("selected");
+			}
+		});
+	}
+
+	// Function to handle selection of suggestion and calling getWeather
+	function selectSuggestion(index) {
+		const selectedSuggestion = suggestionList.querySelectorAll("li")[index];
+		if (selectedSuggestion) {
+			const selectedLocation =
+				selectedSuggestion.querySelector("span").textContent;
+			suggestionsDiv.innerHTML = ""; // clear the suggestions
+			searchInput.classList.remove("active"); // remove the active class from the search input
+			document.querySelector(".search-input").value = ""; // clear the search input
+			getWeather(selectedLocation); // get the weather for the selected location
+		}
+	}
+
+	// Create the list of suggestions
 	predictions.forEach((prediction) => {
 		const listItem = document.createElement("li");
 		const text = document.createElement("span");
@@ -1400,7 +1425,6 @@ async function displaySuggestions(predictions) {
 			// If the copy icon is clicked, then copy the suggestion to the search input
 			if (e.target.classList.contains("copy-icon")) {
 				searchValue.value = prediction;
-				// eslint-disable-next-line no-use-before-define
 				updateSuggestions(prediction); // update the suggestions based on the new input
 				return;
 			}
@@ -1412,6 +1436,27 @@ async function displaySuggestions(predictions) {
 		});
 		suggestionList.appendChild(listItem);
 	});
+
+	// If the user presses the up or down arrow keys, then update the selected suggestion
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "ArrowUp") {
+			e.preventDefault();
+			selectedPrediction = Math.max(selectedPrediction - 1, 0);
+			updateSelected(selectedPrediction);
+		} else if (e.key === "ArrowDown") {
+			e.preventDefault();
+			selectedPrediction = Math.min(
+				selectedPrediction + 1,
+				predictions.length - 1,
+			);
+			updateSelected(selectedPrediction);
+		} else if (e.key === "Escape") {
+			clearSearch();
+		} else if (e.key === "Enter") {
+			selectSuggestion(selectedPrediction);
+		}
+	});
+
 	suggestionsDiv.appendChild(suggestionList);
 }
 

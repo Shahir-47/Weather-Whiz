@@ -870,9 +870,9 @@ input[type="radio"] {
 	cursor: pointer;
 	font-weight: 900;
 	padding-right: 0.5rem;
-	transition: all 0.3s ease;
 }
 
+.selected,
 .suggestions ul li:hover {
 	background-color: #ffffff26;
 	color: #ffffff;
