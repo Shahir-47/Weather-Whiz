@@ -1330,7 +1330,7 @@ async function getWeather(query) {
 	try {
 		// get response from the API
 		const response = await fetch(
-			`http://api.weatherapi.com/v1/forecast.json?days=3&aqi=yes&q=${query}&key=fca53d6c99b24b59ab3201455232107`,
+			`https://api.weatherapi.com/v1/forecast.json?days=3&aqi=yes&q=${query}&key=fca53d6c99b24b59ab3201455232107`,
 			{ mode: "cors" },
 		);
 		// convert the response to JSON
