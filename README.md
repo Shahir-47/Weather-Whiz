@@ -1,4 +1,4 @@
-# Weather Whiz - README
+# Weather Whiz
 
 Weather Whiz is a web application that allows users to get weather information for different locations. It provides current weather data, hourly forecasts, and 2-day forecasts for the selected location. The application also includes a toggle switch to change between imperial and metric units for temperature and other weather parameters.
 
