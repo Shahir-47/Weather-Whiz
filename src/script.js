@@ -84,7 +84,8 @@ function formatDate(date) {
 // converts cm to inches for snow depth
 function convertCmToInches(cm) {
 	const inchesPerCm = 1 / 2.54;
-	return cm * inchesPerCm;
+	const result = cm * inchesPerCm;
+	return result.toFixed(2);
 }
 
 // counts the number of words in a string to determine if the text should be smaller
@@ -1000,7 +1001,7 @@ function displayDayDetail(day) {
 
 	// display the air quality
 	document.querySelector(".popup-body .air").textContent = `${getAirQuality(
-		current.day.air_quality.pm2_5,
+		current.air_quality.pm2_5,
 	)}`;
 
 	// display the sunrise and sunset times
